@@ -8,3 +8,4 @@ Changelog:
   * Initialized the project, with JavaFX and Maven
   * Created the CityNetworkSingleton, containing the data pertaining to cities themselves, and SalesmanSolution, containing a solution gene and calculating the travel distance.
   * Created javadoc comments describing the classes' inner workings.
+  * Produced a single-threaded and multi-threaded problem solver, and compared their efficiency. Results are weird - ramping up the number of threads used is not always good.

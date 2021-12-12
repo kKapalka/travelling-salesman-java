@@ -2,7 +2,7 @@ package pl.kkapalka.salesman.models;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class SalesmanSolution {
+public class SalesmanSolution implements Comparable {
 
     private Random random = new Random();
 
@@ -16,7 +16,7 @@ public class SalesmanSolution {
     /**
      * Travel cost
      */
-    private Long totalTravelCost;
+    private long totalTravelCost;
 
     /**
      * Constructor for new SalesmanSolution class.
@@ -70,7 +70,11 @@ public class SalesmanSolution {
      * On firing the mutation method, the travel cost is re-calculated.
      */
     public void mutate() {
-        this.travelRouteGene[random.nextInt(100)] = random.nextInt(255);
+        int index = random.nextInt(CityNetworkSingleton.getCityGridSize());
+        while(this.travelRouteGene[index] == 0) {
+            index = random.nextInt(CityNetworkSingleton.getCityGridSize());
+        }
+        this.travelRouteGene[index] = random.nextInt(255);
         this.calculateTotalTravelCost();
     }
 
@@ -119,7 +123,29 @@ public class SalesmanSolution {
      * Getter for the total travel cost
      * @return total travel cost
      */
-    public Long getTotalTravelCost() {
+    public long getTotalTravelCost() {
         return totalTravelCost;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        int res = 0;
+        if(o instanceof SalesmanSolution) {
+            SalesmanSolution other = (SalesmanSolution) o;
+            if(this.totalTravelCost == 0) {
+                this.calculateTotalTravelCost();
+            }
+            if(other.totalTravelCost == 0) {
+                other.calculateTotalTravelCost();
+            }
+            if(this.totalTravelCost == other.totalTravelCost) {
+                res = 0;
+            } else if(this.totalTravelCost < other.getTotalTravelCost()) {
+                res = -1;
+            } else {
+                res = 1;
+            }
+        }
+        return res;
     }
 }

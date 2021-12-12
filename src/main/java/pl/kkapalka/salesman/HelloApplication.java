@@ -1,7 +1,5 @@
 package pl.kkapalka.salesman;
 
-import pl.kkapalka.salesman.models.SalesmanSolution;
-import java.util.Arrays;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -18,7 +16,14 @@ public class HelloApplication extends Application {
         stage.setScene(scene);
         stage.show();
 
-        SalesmanSolution solution = new SalesmanSolution(false);
+        pl.kkapalka.salesman.logic.SalesmanSolutionPoolMultiThreaded pool = new pl.kkapalka.salesman.logic.SalesmanSolutionPoolMultiThreaded();
+        pool.startCalculations();
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        pool.stopCalculations();
     }
 
     public static void main(String[] args) {
