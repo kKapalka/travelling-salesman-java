@@ -10,3 +10,4 @@ Changelog:
   * Created javadoc comments describing the classes' inner workings.
   * Produced a single-threaded and multi-threaded problem solver, and compared their efficiency. Results are weird - ramping up the number of threads used is not always good.
   * Added a constraint that while generating a new population every member must have different travel cost (and if there's less than 50 such members, then the best one is duplicated). Lost efficiency, ensured gene variability. Introduced loss.
+  * created HelperMethods, and fixed the mutation rate for single-threaded solver (2 -> 10 for 100 total solutions per generation)

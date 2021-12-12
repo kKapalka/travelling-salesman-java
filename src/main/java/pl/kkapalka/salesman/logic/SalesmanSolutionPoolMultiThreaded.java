@@ -3,6 +3,8 @@ import java.util.ArrayList;
 import pl.kkapalka.salesman.models.SalesmanSolution;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static pl.kkapalka.salesman.HelperMethods.distinctByKey;
+
 public class SalesmanSolutionPoolMultiThreaded implements SalesmanSolutionCallback {
     private SalesmanThread[] salesmanThreads = new SalesmanThread[5];
     private ArrayList<SalesmanSolution> salesmanSolutionArrayList = new ArrayList<>();
@@ -61,11 +63,5 @@ public class SalesmanSolutionPoolMultiThreaded implements SalesmanSolutionCallba
         for(SalesmanThread thread: salesmanThreads) {
             thread.onResume();
         }
-    }
-
-    public static <T> java.util.function.Predicate<T> distinctByKey(java.util.function.Function<? super T, Object> keyExtractor)
-    {
-        java.util.Map<Object, Boolean> map = new java.util.concurrent.ConcurrentHashMap<>();
-        return t -> map.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
 }

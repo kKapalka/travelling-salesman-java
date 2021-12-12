@@ -2,6 +2,8 @@ package pl.kkapalka.salesman.logic;
 import pl.kkapalka.salesman.models.SalesmanSolution;
 import java.util.Random;
 
+import static pl.kkapalka.salesman.HelperMethods.distinctByKey;
+
 public class SalesmanSolutionPoolSingleThreaded {
     SalesmanSolution[] salesmanSolutions = new SalesmanSolution[100];
     Random random = new Random();
@@ -41,13 +43,8 @@ public class SalesmanSolutionPoolSingleThreaded {
             salesmanSolutions[i + (salesmanSolutions.length / 2)] = salesmanSolutions[i].produceOffspring(salesmanSolutions[i+1], 50);
             salesmanSolutions[i + (salesmanSolutions.length / 2) + 1] = salesmanSolutions[i+1].produceOffspring(salesmanSolutions[i], 50);
         }
-        salesmanSolutions[random.nextInt(salesmanSolutions.length)].mutate();
-        salesmanSolutions[random.nextInt(salesmanSolutions.length)].mutate();
-    }
-
-    public static <T> java.util.function.Predicate<T> distinctByKey(java.util.function.Function<? super T, Object> keyExtractor)
-    {
-        java.util.Map<Object, Boolean> map = new java.util.concurrent.ConcurrentHashMap<>();
-        return t -> map.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+        for(int i=0;i< salesmanSolutions.length / 10; i++) {
+            salesmanSolutions[random.nextInt(salesmanSolutions.length)].mutate();
+        }
     }
 }
