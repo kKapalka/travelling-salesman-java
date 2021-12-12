@@ -25,7 +25,6 @@ public class SalesmanThread extends Thread {
         onCalculationFinished();
         while(!complete.get()) {
             while(!waiting.get()) {
-                System.out.print("");
                 createNewGeneration();
                 onCalculationFinished();
             }

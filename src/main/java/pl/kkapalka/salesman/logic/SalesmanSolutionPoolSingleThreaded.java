@@ -24,11 +24,14 @@ public class SalesmanSolutionPoolSingleThreaded {
     }
 
     private void performRankingSelection() {
-        salesmanSolutions = java.util.Arrays.stream(salesmanSolutions)
-                .sorted(java.util.Comparator.comparing(pl.kkapalka.salesman.models.SalesmanSolution::getTotalTravelCost))
-                .toArray(SalesmanSolution[]::new);
-        for(int i = (salesmanSolutions.length / 2); i < salesmanSolutions.length; i++) {
-            salesmanSolutions[i] = null;
+        java.util.ArrayList<SalesmanSolution> sortedList = java.util.Arrays.stream(salesmanSolutions)
+                .sorted(pl.kkapalka.salesman.models.SalesmanSolution::compareTo)
+                .filter(distinctByKey(pl.kkapalka.salesman.models.SalesmanSolution::getTotalTravelCost)).collect(java.util.stream.Collectors.toCollection(java.util.ArrayList::new));
+        for(int i= sortedList.size(); i < salesmanSolutions.length / 2; i++) {
+            sortedList.add(sortedList.get(0));
+        }
+        for(int i = 0; i < salesmanSolutions.length/2; i++) {
+            salesmanSolutions[i] = sortedList.get(i);
         }
         System.out.println(salesmanSolutions[0].getTotalTravelCost());
     }
@@ -40,5 +43,11 @@ public class SalesmanSolutionPoolSingleThreaded {
         }
         salesmanSolutions[random.nextInt(salesmanSolutions.length)].mutate();
         salesmanSolutions[random.nextInt(salesmanSolutions.length)].mutate();
+    }
+
+    public static <T> java.util.function.Predicate<T> distinctByKey(java.util.function.Function<? super T, Object> keyExtractor)
+    {
+        java.util.Map<Object, Boolean> map = new java.util.concurrent.ConcurrentHashMap<>();
+        return t -> map.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
 }
