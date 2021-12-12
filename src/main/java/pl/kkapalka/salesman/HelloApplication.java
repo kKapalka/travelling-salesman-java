@@ -24,6 +24,9 @@ public class HelloApplication extends Application {
             e.printStackTrace();
         }
         pool.stopCalculations();
+//
+//        pl.kkapalka.salesman.logic.SalesmanSolutionPoolSingleThreaded pool = new pl.kkapalka.salesman.logic.SalesmanSolutionPoolSingleThreaded();
+//        pool.startCalculations();
     }
 
     public static void main(String[] args) {

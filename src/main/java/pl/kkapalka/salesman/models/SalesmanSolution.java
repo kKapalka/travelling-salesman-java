@@ -14,6 +14,12 @@ public class SalesmanSolution implements Comparable {
     private int[] travelRouteGene;
 
     /**
+     * Helper variable storing the actual travel route.
+     * Used for better data visualization purposes.
+     */
+    private int[] travelRoute;
+
+    /**
      * Travel cost
      */
     private long totalTravelCost;
@@ -87,6 +93,16 @@ public class SalesmanSolution implements Comparable {
      */
     public void calculateTotalTravelCost() {
         Integer[][] travelCostArray = CityNetworkSingleton.getInstance().getCityTravelCostGrid();
+        travelRoute = calculateRoute();
+        Long sum = 0L;
+        for(int i=1;i<CityNetworkSingleton.getCityGridSize();i++) {
+            sum += travelCostArray[travelRoute[i-1]][travelRoute[i]];
+        }
+        sum += travelCostArray[CityNetworkSingleton.getCityGridSize()-1][0];
+        this.totalTravelCost = sum;
+    }
+
+    private int[] calculateRoute() {
         ArrayList<Integer>[] regroupedCityRanking = (ArrayList<Integer>[]) new ArrayList[256];
         for(int i=0; i<this.travelRouteGene.length; i++) {
             if(regroupedCityRanking[this.travelRouteGene[i]] == null ) {
@@ -103,12 +119,7 @@ public class SalesmanSolution implements Comparable {
                 }
             }
         }
-        Long sum = 0L;
-        for(int i=1;i<CityNetworkSingleton.getCityGridSize();i++) {
-            sum += travelCostArray[route[i-1]][route[i]];
-        }
-        sum += travelCostArray[CityNetworkSingleton.getCityGridSize()-1][0];
-        this.totalTravelCost = sum;
+        return route;
     }
 
     /**
@@ -139,11 +150,11 @@ public class SalesmanSolution implements Comparable {
                 other.calculateTotalTravelCost();
             }
             if(this.totalTravelCost == other.totalTravelCost) {
-                res = 0;
+                return 0;
             } else if(this.totalTravelCost < other.getTotalTravelCost()) {
-                res = -1;
+                return -1;
             } else {
-                res = 1;
+                return 1;
             }
         }
         return res;
