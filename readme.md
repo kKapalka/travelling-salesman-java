@@ -6,3 +6,5 @@ Changelog:
 
 * 12.12.2021
   * Initialized the project, with JavaFX and Maven
+  * Created the CityNetworkSingleton, containing the data pertaining to cities themselves, and SalesmanSolution, containing a solution gene and calculating the travel distance.
+  * Created javadoc comments describing the classes' inner workings.

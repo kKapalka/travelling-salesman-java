@@ -12,4 +12,5 @@ module pl.kkapalka.knapsack {
 
     opens pl.kkapalka.salesman to javafx.fxml;
     exports pl.kkapalka.salesman;
+    exports pl.kkapalka.salesman.models;
 }
