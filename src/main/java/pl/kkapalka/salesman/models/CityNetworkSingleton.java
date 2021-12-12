@@ -4,7 +4,9 @@ import java.util.Random;
 
 public final class CityNetworkSingleton {
     private static CityNetworkSingleton instance;
+    
     private static final Integer CITY_GRID_SIZE = 100;
+    private static final Random random = new Random();
 
     private Integer[][] cityTravelCostGrid;
     private Boolean symmetryConstaint = true;
@@ -58,7 +60,6 @@ public final class CityNetworkSingleton {
      * @return new distance grid
      */
     public Integer[][] generateNewGrid() {
-        Random random = new Random();
         cityTravelCostGrid = new Integer[CITY_GRID_SIZE][CITY_GRID_SIZE];
         for(int i=0;i<CITY_GRID_SIZE; i++) {
             cityTravelCostGrid[i][i] = 0;
