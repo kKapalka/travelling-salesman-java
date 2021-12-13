@@ -8,7 +8,7 @@ public final class CityNetworkSingleton {
     private static final Integer CITY_GRID_SIZE = 100;
     private static final Integer JOINING_POINT = 50;
     private static final Integer TOTAL_SOLUTIONS_PER_GENERATION = 100;
-    private static final Integer TOTAL_THREAD_AMOUNT = 5;
+    private static final Integer TOTAL_THREAD_AMOUNT = 4;
     private static final Random random = new Random();
 
     private Integer[][] cityTravelCostGrid;

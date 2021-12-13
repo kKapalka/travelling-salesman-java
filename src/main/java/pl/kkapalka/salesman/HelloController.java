@@ -10,8 +10,8 @@ public class HelloController {
     @FXML
     protected void onHelloButtonClick() {
         welcomeText.setText("Welcome to JavaFX Application!");
-//        pl.kkapalka.salesman.logic.calculation.SalesmanSolutionPoolMultiThreaded pool = new pl.kkapalka.salesman.logic.calculation.SalesmanSolutionPoolMultiThreaded();
-        pl.kkapalka.salesman.logic.calculation.SalesmanSolutionPoolSingleThreaded pool = new pl.kkapalka.salesman.logic.calculation.SalesmanSolutionPoolSingleThreaded();
+        pl.kkapalka.salesman.logic.calculation.SalesmanSolutionPoolMultiThreaded pool = new pl.kkapalka.salesman.logic.calculation.SalesmanSolutionPoolMultiThreaded();
+//        pl.kkapalka.salesman.logic.calculation.SalesmanSolutionPoolSingleThreaded pool = new pl.kkapalka.salesman.logic.calculation.SalesmanSolutionPoolSingleThreaded();
         pool.startCalculations();
         try {
             Thread.sleep(10000);

@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import java.util.Collections;
 import pl.kkapalka.salesman.logic.calcMode.SalesmanSolutionCalculator;
 import pl.kkapalka.salesman.models.SalesmanSolution;
+import pl.kkapalka.salesman.models.CityNetworkSingleton;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static pl.kkapalka.salesman.HelperMethods.distinctByKey;
@@ -16,10 +17,10 @@ public class SalesmanSolutionPoolMultiThreaded implements SalesmanSolutionCallba
     AtomicInteger waitingThreads = new AtomicInteger(0);
     public int generation = 0;
 
-    public SalesmanSolutionPoolMultiThreaded(int threadNumber) {
-        salesmanThreads = new SalesmanThreadPooled[threadNumber];
+    public SalesmanSolutionPoolMultiThreaded() {
+        salesmanThreads = new SalesmanThreadPooled[CityNetworkSingleton.getTotalThreadAmount()];
         for(int i=0;i<salesmanThreads.length; i++) {
-            salesmanThreads[i] = new SalesmanThreadPooled(this, threadNumber);
+            salesmanThreads[i] = new SalesmanThreadPooled(this, CityNetworkSingleton.getTotalThreadAmount());
         }
     }
 
@@ -51,20 +52,21 @@ public class SalesmanSolutionPoolMultiThreaded implements SalesmanSolutionCallba
     public void produceGeneration() {
         this.waitingThreads.set(0);
         generation++;
+        int halfPopulation = CityNetworkSingleton.getTotalSolutionsPerGeneration() / 2;
         this.salesmanSolutionArrayList = Arrays.stream(this.salesmanThreads)
                 .flatMap(thread -> Stream.of(thread.solutionArray))
                 .sorted(SalesmanSolution::compareTo)
                 .filter(distinctByKey(SalesmanSolution::getTotalTravelCost))
-                .limit(salesmanThreads.length * 10L)
+                .limit(halfPopulation)
                 .collect(Collectors.toCollection(ArrayList::new));
 
-        for(int i= salesmanSolutionArrayList.size(); i < salesmanThreads.length * 10L; i++) {
+        for(int i= salesmanSolutionArrayList.size(); i < halfPopulation; i++) {
             salesmanSolutionArrayList.add(salesmanSolutionArrayList.get(0));
         }
         System.out.println(salesmanSolutionArrayList.get(0).getTotalTravelCost());
         Collections.shuffle(salesmanSolutionArrayList);
         for (int i=0;i<salesmanThreads.length; i++) {
-            salesmanThreads[i].onSolutionRedistribution(salesmanSolutionArrayList.subList(i * 10, (i + 1) * 10).toArray(SalesmanSolution[]::new));
+            salesmanThreads[i].onSolutionRedistribution(salesmanSolutionArrayList.subList(i * (halfPopulation / salesmanThreads.length), (i + 1) * (halfPopulation / salesmanThreads.length)).toArray(SalesmanSolution[]::new));
         }
         for(SalesmanThreadPooled thread: salesmanThreads) {
             thread.onResume();

@@ -14,7 +14,7 @@ public enum CalculationModeSelector {
     MULTI_THREADED {
         @Override
         public SalesmanSolutionCalculator createCalculator() {
-            return new SalesmanSolutionPoolMultiThreaded(CityNetworkSingleton.getTotalThreadAmount());
+            return new SalesmanSolutionPoolMultiThreaded();
         }
     };
 
