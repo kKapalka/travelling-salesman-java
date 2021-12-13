@@ -1,5 +1,9 @@
 package pl.kkapalka.salesman.logic;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.stream.Stream;
+import java.util.stream.Collectors;
+import java.util.Collections;
 import pl.kkapalka.salesman.models.SalesmanSolution;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -45,18 +49,18 @@ public class SalesmanSolutionPoolMultiThreaded implements SalesmanSolutionCallba
     public void produceGeneration() {
         this.waitingThreads.set(0);
         generation++;
-        this.salesmanSolutionArrayList = java.util.Arrays.stream(this.salesmanThreads)
-                .flatMap(thread -> java.util.stream.Stream.of(thread.solutionArray))
-                .sorted(pl.kkapalka.salesman.models.SalesmanSolution::compareTo)
-                .filter(distinctByKey(pl.kkapalka.salesman.models.SalesmanSolution::getTotalTravelCost))
+        this.salesmanSolutionArrayList = Arrays.stream(this.salesmanThreads)
+                .flatMap(thread -> Stream.of(thread.solutionArray))
+                .sorted(SalesmanSolution::compareTo)
+                .filter(distinctByKey(SalesmanSolution::getTotalTravelCost))
                 .limit(salesmanThreads.length * 10L)
-                .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+                .collect(Collectors.toCollection(ArrayList::new));
 
         for(int i= salesmanSolutionArrayList.size(); i < salesmanThreads.length * 10L; i++) {
             salesmanSolutionArrayList.add(salesmanSolutionArrayList.get(0));
         }
         System.out.println(salesmanSolutionArrayList.get(0).getTotalTravelCost());
-        java.util.Collections.shuffle(salesmanSolutionArrayList);
+        Collections.shuffle(salesmanSolutionArrayList);
         for (int i=0;i<salesmanThreads.length; i++) {
             salesmanThreads[i].onSolutionRedistribution(salesmanSolutionArrayList.subList(i * 10, (i + 1) * 10).toArray(SalesmanSolution[]::new));
         }

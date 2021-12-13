@@ -76,11 +76,7 @@ public class SalesmanSolution implements Comparable {
      * On firing the mutation method, the travel cost is re-calculated.
      */
     public void mutate() {
-        int index = random.nextInt(CityNetworkSingleton.getCityGridSize());
-        while(this.travelRouteGene[index] == 0) {
-            index = random.nextInt(CityNetworkSingleton.getCityGridSize());
-        }
-        this.travelRouteGene[index] = random.nextInt(255);
+        this.travelRouteGene[random.nextInt(CityNetworkSingleton.getCityGridSize())] = random.nextInt(255);
         this.calculateTotalTravelCost();
     }
 

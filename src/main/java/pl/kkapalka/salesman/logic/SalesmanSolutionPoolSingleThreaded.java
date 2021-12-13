@@ -1,6 +1,10 @@
 package pl.kkapalka.salesman.logic;
 import pl.kkapalka.salesman.models.SalesmanSolution;
+import pl.kkapalka.salesman.models.CityNetworkSingleton;
+import java.util.stream.Collectors;
 import java.util.Random;
+import java.util.Arrays;
+import java.util.ArrayList;
 
 import static pl.kkapalka.salesman.HelperMethods.distinctByKey;
 
@@ -11,7 +15,7 @@ public class SalesmanSolutionPoolSingleThreaded {
 
     public SalesmanSolutionPoolSingleThreaded() {
         for(int i=0;i<salesmanSolutions.length; i++) {
-            salesmanSolutions[i] = new pl.kkapalka.salesman.models.SalesmanSolution(false);
+            salesmanSolutions[i] = new SalesmanSolution(false);
         }
     }
 
@@ -26,22 +30,24 @@ public class SalesmanSolutionPoolSingleThreaded {
     }
 
     private void performRankingSelection() {
-        java.util.ArrayList<SalesmanSolution> sortedList = java.util.Arrays.stream(salesmanSolutions)
-                .sorted(pl.kkapalka.salesman.models.SalesmanSolution::compareTo)
-                .filter(distinctByKey(pl.kkapalka.salesman.models.SalesmanSolution::getTotalTravelCost)).collect(java.util.stream.Collectors.toCollection(java.util.ArrayList::new));
+        ArrayList<SalesmanSolution> sortedList = Arrays.stream(salesmanSolutions)
+                .sorted(SalesmanSolution::compareTo)
+                .filter(distinctByKey(SalesmanSolution::getTotalTravelCost))
+                .limit(50).collect(Collectors.toCollection(ArrayList::new));
         for(int i= sortedList.size(); i < salesmanSolutions.length / 2; i++) {
             sortedList.add(sortedList.get(0));
         }
+        System.out.println(sortedList.get(0).getTotalTravelCost());
+        java.util.Collections.shuffle(sortedList);
         for(int i = 0; i < salesmanSolutions.length/2; i++) {
             salesmanSolutions[i] = sortedList.get(i);
         }
-        System.out.println(salesmanSolutions[0].getTotalTravelCost());
     }
 
     private void createNewGeneration() {
         for(int i=0;i<salesmanSolutions.length / 2; i+=2) {
-            salesmanSolutions[i + (salesmanSolutions.length / 2)] = salesmanSolutions[i].produceOffspring(salesmanSolutions[i+1], 50);
-            salesmanSolutions[i + (salesmanSolutions.length / 2) + 1] = salesmanSolutions[i+1].produceOffspring(salesmanSolutions[i], 50);
+            salesmanSolutions[i + (salesmanSolutions.length / 2)] = salesmanSolutions[i].produceOffspring(salesmanSolutions[i+1], CityNetworkSingleton.getJoiningPoint());
+            salesmanSolutions[i + (salesmanSolutions.length / 2) + 1] = salesmanSolutions[i+1].produceOffspring(salesmanSolutions[i], CityNetworkSingleton.getJoiningPoint());
         }
         for(int i=0;i< salesmanSolutions.length / 10; i++) {
             salesmanSolutions[random.nextInt(salesmanSolutions.length)].mutate();

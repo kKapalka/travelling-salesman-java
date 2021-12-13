@@ -6,6 +6,7 @@ public final class CityNetworkSingleton {
     private static CityNetworkSingleton instance;
     
     private static final Integer CITY_GRID_SIZE = 100;
+    private static final Integer JOINING_POINT = 50;
     private static final Random random = new Random();
 
     private Integer[][] cityTravelCostGrid;
@@ -86,6 +87,15 @@ public final class CityNetworkSingleton {
      */
     public Integer[][] getCityTravelCostGrid() {
         return cityTravelCostGrid;
+    }
+
+    /**
+     * Getter for the joining point - the index of a gene, where the offspring stops
+     * getting information from one parent and starts from another
+     * @return joining point
+     */
+    public static Integer getJoiningPoint() {
+        return JOINING_POINT;
     }
 
     /**

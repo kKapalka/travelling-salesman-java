@@ -4,6 +4,12 @@ Implementation of a solver of the Travelling Salesman problem, using genetic alg
 
 Changelog:
 
+* 13.12.2021
+  * Moved the data about joining point to CityNetworkSingleton since it is a constant
+  * Fixed import statements for readability
+  * Moved firing of the solution calculation to onButtonClick event
+
+
 * 12.12.2021
   * Initialized the project, with JavaFX and Maven
   * Created the CityNetworkSingleton, containing the data pertaining to cities themselves, and SalesmanSolution, containing a solution gene and calculating the travel distance.

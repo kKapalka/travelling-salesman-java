@@ -2,6 +2,7 @@ package pl.kkapalka.salesman.logic;
 
 import pl.kkapalka.salesman.models.SalesmanSolution;
 import java.util.concurrent.atomic.AtomicBoolean;
+import pl.kkapalka.salesman.models.CityNetworkSingleton;
 import java.util.Random;
 
 public class SalesmanThread extends Thread {
@@ -11,7 +12,6 @@ public class SalesmanThread extends Thread {
     final SalesmanSolutionCallback callback;
     AtomicBoolean waiting = new AtomicBoolean(false);
     AtomicBoolean complete = new AtomicBoolean(false);
-    int generation = 0;
 
     public SalesmanThread(SalesmanSolutionCallback callback) {
         this.callback = callback;
@@ -52,8 +52,8 @@ public class SalesmanThread extends Thread {
 
     private void createNewGeneration() {
         for(int i=0;i<solutionArray.length / 2; i+=2) {
-            solutionArray[i + 10] = solutionArray[i].produceOffspring(solutionArray[i+1], 50);
-            solutionArray[i + 11] = solutionArray[i+1].produceOffspring(solutionArray[i], 50);
+            solutionArray[i + 10] = solutionArray[i].produceOffspring(solutionArray[i+1], CityNetworkSingleton.getJoiningPoint());
+            solutionArray[i + 11] = solutionArray[i+1].produceOffspring(solutionArray[i], CityNetworkSingleton.getJoiningPoint());
         }
         solutionArray[random.nextInt(solutionArray.length)].mutate();
         solutionArray[random.nextInt(solutionArray.length)].mutate();
