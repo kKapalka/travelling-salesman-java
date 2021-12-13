@@ -38,6 +38,7 @@ public class SalesmanThreadPooled extends Thread {
     public void cease() {
         this.complete.set(true);
     }
+
     private void onCalculationFinished() {
         this.waiting.set(true);
         callback.transferSolutions();

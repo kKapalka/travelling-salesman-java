@@ -11,6 +11,7 @@ Changelog:
   * Rewrote single-threaded solver so that it can be stopped at will
   * Rewrote multi-threaded solver so that it can handle a variable amount of threads 
   * Found and resolved an edge case where the calculations wouldn't stop if numbers of threads used for multi-threaded solver equals 1
+  * Started to work on the GUI. It will contain 3 tabs: Cities, where user can look up the city connection chart; Progress graph, where user can watch how the result has been changing over time; Results, which will contain top 50 solutions from the last generation upon cancelling. To start calculating, user will press 'Start calculations', and to stop, he will press 'Stop calculations'. Upon pressing on a specific gene, a modal window will show up with the overall path and the travel costl.
 
 
 * 12.12.2021

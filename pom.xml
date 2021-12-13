@@ -112,7 +112,7 @@
                         <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>pl.kkapalka.salesman/pl.kkapalka.salesman.HelloApplication</mainClass>
+                            <mainClass>pl.kkapalka.salesman/pl.kkapalka.salesman.SalesmanSolverApplication</mainClass>
                         </configuration>
                     </execution>
                 </executions>
