@@ -7,6 +7,8 @@ public final class CityNetworkSingleton {
     
     private static final Integer CITY_GRID_SIZE = 100;
     private static final Integer JOINING_POINT = 50;
+    private static final Integer TOTAL_SOLUTIONS_PER_GENERATION = 100;
+    private static final Integer TOTAL_THREAD_AMOUNT = 5;
     private static final Random random = new Random();
 
     private Integer[][] cityTravelCostGrid;
@@ -96,6 +98,22 @@ public final class CityNetworkSingleton {
      */
     public static Integer getJoiningPoint() {
         return JOINING_POINT;
+    }
+
+    /**
+     * Getter for the amount of solutions per each generation
+     * @return total solutions per generation
+     */
+    public static Integer getTotalSolutionsPerGeneration() {
+        return TOTAL_SOLUTIONS_PER_GENERATION;
+    }
+
+    /**
+     * Getter for the amount of threads for multi-threaded solver
+     * @return total thread amount
+     */
+    public static Integer getTotalThreadAmount() {
+        return TOTAL_THREAD_AMOUNT;
     }
 
     /**

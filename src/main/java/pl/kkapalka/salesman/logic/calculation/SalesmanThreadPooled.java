@@ -1,19 +1,20 @@
-package pl.kkapalka.salesman.logic;
+package pl.kkapalka.salesman.logic.calculation;
 
 import pl.kkapalka.salesman.models.SalesmanSolution;
 import java.util.concurrent.atomic.AtomicBoolean;
 import pl.kkapalka.salesman.models.CityNetworkSingleton;
 import java.util.Random;
 
-public class SalesmanThread extends Thread {
+public class SalesmanThreadPooled extends Thread {
 
-    SalesmanSolution[] solutionArray = new SalesmanSolution[20];
+    SalesmanSolution[] solutionArray;
     Random random = new Random();
     final SalesmanSolutionCallback callback;
     AtomicBoolean waiting = new AtomicBoolean(false);
     AtomicBoolean complete = new AtomicBoolean(false);
 
-    public SalesmanThread(SalesmanSolutionCallback callback) {
+    public SalesmanThreadPooled(SalesmanSolutionCallback callback, int threadNumber) {
+        this.solutionArray = new SalesmanSolution[CityNetworkSingleton.getTotalSolutionsPerGeneration() / threadNumber];
         this.callback = callback;
     }
 
@@ -37,7 +38,7 @@ public class SalesmanThread extends Thread {
     }
     private void onCalculationFinished() {
         this.waiting.set(true);
-        callback.transferSolutions(solutionArray);
+        callback.transferSolutions();
     }
 
     public void onResume() {
@@ -51,11 +52,16 @@ public class SalesmanThread extends Thread {
     }
 
     private void createNewGeneration() {
-        for(int i=0;i<solutionArray.length / 2; i+=2) {
-            solutionArray[i + 10] = solutionArray[i].produceOffspring(solutionArray[i+1], CityNetworkSingleton.getJoiningPoint());
-            solutionArray[i + 11] = solutionArray[i+1].produceOffspring(solutionArray[i], CityNetworkSingleton.getJoiningPoint());
+        int halfLength = solutionArray.length / 2;
+        for(int i=0;i<halfLength; i+=2) {
+            solutionArray[i + halfLength] = solutionArray[i].produceOffspring(solutionArray[i+1], CityNetworkSingleton.getJoiningPoint());
+            solutionArray[i + halfLength + 1] = solutionArray[i+1].produceOffspring(solutionArray[i], CityNetworkSingleton.getJoiningPoint());
         }
-        solutionArray[random.nextInt(solutionArray.length)].mutate();
-        solutionArray[random.nextInt(solutionArray.length)].mutate();
+        if(solutionArray.length % 2 != 0) {
+            solutionArray[solutionArray.length - 1] = solutionArray[1].produceOffspring(solutionArray[solutionArray.length - 2], CityNetworkSingleton.getJoiningPoint());
+        }
+        for(int i=0;i<solutionArray.length; i+=10) {
+            solutionArray[random.nextInt(solutionArray.length)].mutate();
+        }
     }
 }

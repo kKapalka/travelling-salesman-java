@@ -1,6 +1,6 @@
-package pl.kkapalka.salesman.logic;
+package pl.kkapalka.salesman.logic.calculation;
 import pl.kkapalka.salesman.models.SalesmanSolution;
 
 public interface SalesmanSolutionCallback {
-    void transferSolutions(SalesmanSolution[] solutionArray);
+    void transferSolutions();
 }

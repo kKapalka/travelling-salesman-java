@@ -1,33 +1,35 @@
-package pl.kkapalka.salesman.logic;
+package pl.kkapalka.salesman.logic.calculation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Stream;
 import java.util.stream.Collectors;
 import java.util.Collections;
+import pl.kkapalka.salesman.logic.calcMode.SalesmanSolutionCalculator;
 import pl.kkapalka.salesman.models.SalesmanSolution;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static pl.kkapalka.salesman.HelperMethods.distinctByKey;
 
-public class SalesmanSolutionPoolMultiThreaded implements SalesmanSolutionCallback {
-    private SalesmanThread[] salesmanThreads = new SalesmanThread[5];
+public class SalesmanSolutionPoolMultiThreaded implements SalesmanSolutionCallback, SalesmanSolutionCalculator {
+    private SalesmanThreadPooled[] salesmanThreads;
     private ArrayList<SalesmanSolution> salesmanSolutionArrayList = new ArrayList<>();
     AtomicInteger waitingThreads = new AtomicInteger(0);
     public int generation = 0;
 
-    public SalesmanSolutionPoolMultiThreaded() {
+    public SalesmanSolutionPoolMultiThreaded(int threadNumber) {
+        salesmanThreads = new SalesmanThreadPooled[threadNumber];
         for(int i=0;i<salesmanThreads.length; i++) {
-            salesmanThreads[i] = new SalesmanThread(this);
+            salesmanThreads[i] = new SalesmanThreadPooled(this, threadNumber);
         }
     }
 
     public void startCalculations() {
-        for (SalesmanThread salesmanThread : salesmanThreads) {
+        for (SalesmanThreadPooled salesmanThread : salesmanThreads) {
             salesmanThread.start();
         }
     }
     public void stopCalculations() {
-        for (SalesmanThread salesmanThread : salesmanThreads) {
+        for (SalesmanThreadPooled salesmanThread : salesmanThreads) {
             salesmanThread.cease();
             try {
                 salesmanThread.join();
@@ -39,7 +41,7 @@ public class SalesmanSolutionPoolMultiThreaded implements SalesmanSolutionCallba
     }
 
     @Override
-    public synchronized void transferSolutions(SalesmanSolution[] solutionArray) {
+    public synchronized void transferSolutions() {
         this.waitingThreads.incrementAndGet();
         if(this.waitingThreads.get() == salesmanThreads.length) {
             produceGeneration();
@@ -64,7 +66,7 @@ public class SalesmanSolutionPoolMultiThreaded implements SalesmanSolutionCallba
         for (int i=0;i<salesmanThreads.length; i++) {
             salesmanThreads[i].onSolutionRedistribution(salesmanSolutionArrayList.subList(i * 10, (i + 1) * 10).toArray(SalesmanSolution[]::new));
         }
-        for(SalesmanThread thread: salesmanThreads) {
+        for(SalesmanThreadPooled thread: salesmanThreads) {
             thread.onResume();
         }
     }

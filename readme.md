@@ -8,6 +8,7 @@ Changelog:
   * Moved the data about joining point to CityNetworkSingleton since it is a constant
   * Fixed import statements for readability
   * Moved firing of the solution calculation to onButtonClick event
+  * Rewrote single-threaded solver so that it can be stopped at will 
 
 
 * 12.12.2021
