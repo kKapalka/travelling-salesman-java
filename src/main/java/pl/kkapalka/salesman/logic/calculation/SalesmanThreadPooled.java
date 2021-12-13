@@ -28,9 +28,11 @@ public class SalesmanThreadPooled extends Thread {
             while(!waiting.get()) {
                 createNewGeneration();
                 onCalculationFinished();
+                if(complete.get()) {
+                    break;
+                }
             }
         }
-
     }
 
     public void cease() {
@@ -53,9 +55,9 @@ public class SalesmanThreadPooled extends Thread {
 
     private void createNewGeneration() {
         int halfLength = solutionArray.length / 2;
-        for(int i=0;i<halfLength; i+=2) {
-            solutionArray[i + halfLength] = solutionArray[i].produceOffspring(solutionArray[i+1], CityNetworkSingleton.getJoiningPoint());
-            solutionArray[i + halfLength + 1] = solutionArray[i+1].produceOffspring(solutionArray[i], CityNetworkSingleton.getJoiningPoint());
+        for(int i=1;i<halfLength; i+=2) {
+            solutionArray[i + halfLength] = solutionArray[i].produceOffspring(solutionArray[i-1], CityNetworkSingleton.getJoiningPoint());
+            solutionArray[i + halfLength - 1] = solutionArray[i-1].produceOffspring(solutionArray[i], CityNetworkSingleton.getJoiningPoint());
         }
         if(solutionArray.length % 2 != 0) {
             solutionArray[solutionArray.length - 1] = solutionArray[1].produceOffspring(solutionArray[solutionArray.length - 2], CityNetworkSingleton.getJoiningPoint());

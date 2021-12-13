@@ -10,6 +10,7 @@ Changelog:
   * Moved firing of the solution calculation to onButtonClick event
   * Rewrote single-threaded solver so that it can be stopped at will
   * Rewrote multi-threaded solver so that it can handle a variable amount of threads 
+  * Found and resolved an edge case where the calculations wouldn't stop if numbers of threads used for multi-threaded solver equals 1
 
 
 * 12.12.2021
