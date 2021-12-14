@@ -5,6 +5,7 @@ import java.util.stream.Stream;
 import java.util.stream.Collectors;
 import java.util.Collections;
 import pl.kkapalka.salesman.logic.calcMode.SalesmanSolutionCalculator;
+import pl.kkapalka.salesman.logic.calcMode.SalesmanCalculatorCallback;
 import pl.kkapalka.salesman.models.SalesmanSolution;
 import pl.kkapalka.salesman.models.CityNetworkSingleton;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -15,16 +16,16 @@ public class SalesmanSolutionPoolMultiThreaded implements SalesmanSolutionCallba
     private final SalesmanThreadPooled[] salesmanThreads;
     private ArrayList<SalesmanSolution> salesmanSolutionArrayList;
     AtomicInteger waitingThreads = new AtomicInteger(0);
-    public int generation = 0;
     boolean calculating = false;
+    SalesmanCalculatorCallback callback;
 
-    public SalesmanSolutionPoolMultiThreaded() {
+    public SalesmanSolutionPoolMultiThreaded(SalesmanCalculatorCallback callback) {
+        this.callback = callback;
         salesmanThreads = new SalesmanThreadPooled[CityNetworkSingleton.getTotalThreadAmount()];
         for(int i=0;i<salesmanThreads.length; i++) {
             salesmanThreads[i] = new SalesmanThreadPooled(this, CityNetworkSingleton.getTotalThreadAmount());
         }
         salesmanSolutionArrayList = new ArrayList<>();
-        generation = 0;
     }
 
     public void startCalculations() {
@@ -41,7 +42,6 @@ public class SalesmanSolutionPoolMultiThreaded implements SalesmanSolutionCallba
                 e.printStackTrace();
             }
         }
-        System.out.println("generation "+generation);
     }
 
     public void toggleCalculation() {
@@ -62,9 +62,12 @@ public class SalesmanSolutionPoolMultiThreaded implements SalesmanSolutionCallba
         }
     }
 
+    @Override
+    public void transferSolutions(pl.kkapalka.salesman.models.SalesmanSolution bestSolution) {
+    }
+
     public void produceGeneration() {
         this.waitingThreads.set(0);
-        generation++;
         int halfPopulation = CityNetworkSingleton.getTotalSolutionsPerGeneration() / 2;
         this.salesmanSolutionArrayList = Arrays.stream(this.salesmanThreads)
                 .flatMap(thread -> Stream.of(thread.solutionArray))
@@ -72,11 +75,11 @@ public class SalesmanSolutionPoolMultiThreaded implements SalesmanSolutionCallba
                 .filter(distinctByKey(SalesmanSolution::getTotalTravelCost))
                 .limit(halfPopulation)
                 .collect(Collectors.toCollection(ArrayList::new));
-
+        callback.onTransmitGraphData(salesmanSolutionArrayList.get(0).getTotalTravelCost(), salesmanSolutionArrayList.stream()
+                .mapToLong(SalesmanSolution::getTotalTravelCost).average().getAsDouble());
         for(int i= salesmanSolutionArrayList.size(); i < halfPopulation; i++) {
             salesmanSolutionArrayList.add(salesmanSolutionArrayList.get(0));
         }
-        System.out.println(salesmanSolutionArrayList.get(0).getTotalTravelCost());
         Collections.shuffle(salesmanSolutionArrayList);
         for (int i=0;i<salesmanThreads.length; i++) {
             salesmanThreads[i].onSolutionRedistribution(salesmanSolutionArrayList.subList(i * (halfPopulation / salesmanThreads.length), (i + 1) * (halfPopulation / salesmanThreads.length)).toArray(SalesmanSolution[]::new));

@@ -3,4 +3,5 @@ import pl.kkapalka.salesman.models.SalesmanSolution;
 
 public interface SalesmanSolutionCallback {
     void transferSolutions();
+    void transferSolutions(SalesmanSolution bestSolution);
 }

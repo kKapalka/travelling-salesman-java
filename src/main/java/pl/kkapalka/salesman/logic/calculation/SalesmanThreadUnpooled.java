@@ -45,12 +45,11 @@ public class SalesmanThreadUnpooled extends Thread{
         for(int i= sortedList.size(); i < salesmanSolutions.length / 2; i++) {
             sortedList.add(sortedList.get(0));
         }
-        System.out.println(sortedList.get(0).getTotalTravelCost());
+        callback.transferSolutions(sortedList.get(0));
         java.util.Collections.shuffle(sortedList);
         for(int i = 0; i < salesmanSolutions.length/2; i++) {
             salesmanSolutions[i] = sortedList.get(i);
         }
-        callback.transferSolutions();
     }
 
     private void createNewGeneration() {

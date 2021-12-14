@@ -1,12 +1,16 @@
 package pl.kkapalka.salesman.logic.calculation;
 import pl.kkapalka.salesman.logic.calcMode.SalesmanSolutionCalculator;
+import pl.kkapalka.salesman.logic.calcMode.SalesmanCalculatorCallback;
+import pl.kkapalka.salesman.models.SalesmanSolution;
 
 public class SalesmanSolutionPoolSingleThreaded implements SalesmanSolutionCalculator, SalesmanSolutionCallback {
     private SalesmanThreadUnpooled thread;
     int generation;
     boolean calculating = false;
+    SalesmanCalculatorCallback callback;
 
-    public SalesmanSolutionPoolSingleThreaded() {
+    public SalesmanSolutionPoolSingleThreaded(SalesmanCalculatorCallback callback) {
+        this.callback = callback;
         thread = new SalesmanThreadUnpooled(this);
     }
 
@@ -16,7 +20,6 @@ public class SalesmanSolutionPoolSingleThreaded implements SalesmanSolutionCalcu
 
     public void stopCalculations() {
         thread.cease();
-        System.out.println("generation "+generation);
     }
 
     public void toggleCalculation() {
@@ -31,6 +34,11 @@ public class SalesmanSolutionPoolSingleThreaded implements SalesmanSolutionCalcu
 
     @Override
     public synchronized void transferSolutions() {
-        generation++;
+    }
+
+    @Override
+    public void transferSolutions(SalesmanSolution bestSolution) {
+        callback.onTransmitGraphData(bestSolution.getTotalTravelCost(), java.util.Arrays.stream(thread.salesmanSolutions)
+                .mapToLong(SalesmanSolution::getTotalTravelCost).average().getAsDouble());
     }
 }
