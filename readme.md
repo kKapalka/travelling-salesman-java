@@ -4,6 +4,9 @@ Implementation of a solver of the Travelling Salesman problem, using genetic alg
 
 Changelog:
 
+* 14.12.2021
+  * Solver can now be started and stopped at will
+
 * 13.12.2021
   * Moved the data about joining point to CityNetworkSingleton since it is a constant
   * Fixed import statements for readability

@@ -12,16 +12,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static pl.kkapalka.salesman.HelperMethods.distinctByKey;
 
 public class SalesmanSolutionPoolMultiThreaded implements SalesmanSolutionCallback, SalesmanSolutionCalculator {
-    private SalesmanThreadPooled[] salesmanThreads;
-    private ArrayList<SalesmanSolution> salesmanSolutionArrayList = new ArrayList<>();
+    private final SalesmanThreadPooled[] salesmanThreads;
+    private ArrayList<SalesmanSolution> salesmanSolutionArrayList;
     AtomicInteger waitingThreads = new AtomicInteger(0);
     public int generation = 0;
+    boolean calculating = false;
 
     public SalesmanSolutionPoolMultiThreaded() {
         salesmanThreads = new SalesmanThreadPooled[CityNetworkSingleton.getTotalThreadAmount()];
         for(int i=0;i<salesmanThreads.length; i++) {
             salesmanThreads[i] = new SalesmanThreadPooled(this, CityNetworkSingleton.getTotalThreadAmount());
         }
+        salesmanSolutionArrayList = new ArrayList<>();
+        generation = 0;
     }
 
     public void startCalculations() {
@@ -39,6 +42,16 @@ public class SalesmanSolutionPoolMultiThreaded implements SalesmanSolutionCallba
             }
         }
         System.out.println("generation "+generation);
+    }
+
+    public void toggleCalculation() {
+        if(calculating) {
+            stopCalculations();
+            calculating = false;
+        } else {
+            startCalculations();
+            calculating = true;
+        }
     }
 
     @Override

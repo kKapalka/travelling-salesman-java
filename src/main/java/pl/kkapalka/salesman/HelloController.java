@@ -2,22 +2,21 @@ package pl.kkapalka.salesman;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import pl.kkapalka.salesman.logic.calcMode.SalesmanSolutionCalculator;
+import pl.kkapalka.salesman.logic.calcMode.CalculationModeSelector;
 
 public class HelloController {
-    @FXML
-    private Label welcomeText;
+
+    boolean calculating = false;
+    SalesmanSolutionCalculator calculator;
 
     @FXML
-    protected void onHelloButtonClick() {
-        welcomeText.setText("Welcome to JavaFX Application!");
-        pl.kkapalka.salesman.logic.calculation.SalesmanSolutionPoolMultiThreaded pool = new pl.kkapalka.salesman.logic.calculation.SalesmanSolutionPoolMultiThreaded();
-//        pl.kkapalka.salesman.logic.calculation.SalesmanSolutionPoolSingleThreaded pool = new pl.kkapalka.salesman.logic.calculation.SalesmanSolutionPoolSingleThreaded();
-        pool.startCalculations();
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+    protected void toggleCalculations() {
+        if(!calculating) {
+            calculator = CalculationModeSelector.MULTI_THREADED.createCalculator();
         }
-        pool.stopCalculations();
+        calculator.toggleCalculation();
+        calculating = !calculating;
     }
+
 }

@@ -4,6 +4,7 @@ import pl.kkapalka.salesman.logic.calcMode.SalesmanSolutionCalculator;
 public class SalesmanSolutionPoolSingleThreaded implements SalesmanSolutionCalculator, SalesmanSolutionCallback {
     private SalesmanThreadUnpooled thread;
     int generation;
+    boolean calculating = false;
 
     public SalesmanSolutionPoolSingleThreaded() {
         thread = new SalesmanThreadUnpooled(this);
@@ -16,6 +17,16 @@ public class SalesmanSolutionPoolSingleThreaded implements SalesmanSolutionCalcu
     public void stopCalculations() {
         thread.cease();
         System.out.println("generation "+generation);
+    }
+
+    public void toggleCalculation() {
+        if(calculating) {
+            stopCalculations();
+            calculating = false;
+        } else {
+            startCalculations();
+            calculating = true;
+        }
     }
 
     @Override
