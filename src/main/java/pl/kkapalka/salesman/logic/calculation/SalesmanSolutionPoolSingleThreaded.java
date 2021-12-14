@@ -2,6 +2,8 @@ package pl.kkapalka.salesman.logic.calculation;
 import pl.kkapalka.salesman.logic.calcMode.SalesmanSolutionCalculator;
 import pl.kkapalka.salesman.logic.calcMode.SalesmanCalculatorCallback;
 import pl.kkapalka.salesman.models.SalesmanSolution;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import java.util.ArrayList;
 
@@ -22,23 +24,23 @@ public class SalesmanSolutionPoolSingleThreaded implements SalesmanSolutionCalcu
 
     public void stopCalculation() {
         thread.cease();
-        ArrayList<SalesmanSolution> sortedList = java.util.Arrays.stream(thread.salesmanSolutions)
+        ArrayList<SalesmanSolution> sortedList = Arrays.stream(thread.salesmanSolutions)
                 .sorted(SalesmanSolution::compareTo)
                 .filter(distinctByKey(SalesmanSolution::getTotalTravelCost))
-                .limit(50).collect(java.util.stream.Collectors.toCollection(java.util.ArrayList::new));
+                .limit(50).collect(Collectors.toCollection(ArrayList::new));
         for(int i= sortedList.size(); i < thread.salesmanSolutions.length / 2; i++) {
             sortedList.add(sortedList.get(0));
         }
-        callback.onCollectLastGeneration(sortedList.stream().sorted(SalesmanSolution::compareTo).toArray(SalesmanSolution[]::new));
+        callback.onCollectLastGeneration(sortedList.stream().sorted(SalesmanSolution::compareTo).collect(Collectors.toList()));
     }
 
     @Override
-    public synchronized void transferSolutions() {
+    public void transferSolutions() {
     }
 
     @Override
-    public void transferSolutions(SalesmanSolution bestSolution) {
-        callback.onTransmitGraphData(bestSolution.getTotalTravelCost(), java.util.Arrays.stream(thread.salesmanSolutions)
+    public synchronized void transferSolutions(SalesmanSolution bestSolution) {
+        callback.onTransmitGraphData(bestSolution.getTotalTravelCost(), Arrays.stream(thread.salesmanSolutions)
                 .mapToLong(SalesmanSolution::getTotalTravelCost).average().getAsDouble());
     }
 }

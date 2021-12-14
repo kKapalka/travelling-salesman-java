@@ -1,6 +1,5 @@
 package pl.kkapalka.salesman.logic.calcMode;
 
-import pl.kkapalka.salesman.models.CityNetworkSingleton;
 import pl.kkapalka.salesman.logic.calculation.SalesmanSolutionPoolSingleThreaded;
 import pl.kkapalka.salesman.logic.calculation.SalesmanSolutionPoolMultiThreaded;
 

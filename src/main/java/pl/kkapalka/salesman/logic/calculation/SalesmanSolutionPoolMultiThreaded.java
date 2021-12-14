@@ -41,7 +41,7 @@ public class SalesmanSolutionPoolMultiThreaded implements SalesmanSolutionCallba
                 e.printStackTrace();
             }
         }
-        callback.onCollectLastGeneration(salesmanSolutionArrayList.stream().sorted(SalesmanSolution::compareTo).toArray(SalesmanSolution[]::new));
+        callback.onCollectLastGeneration(salesmanSolutionArrayList.stream().sorted(SalesmanSolution::compareTo).collect(Collectors.toList()));
     }
 
     @Override
@@ -53,7 +53,7 @@ public class SalesmanSolutionPoolMultiThreaded implements SalesmanSolutionCallba
     }
 
     @Override
-    public void transferSolutions(pl.kkapalka.salesman.models.SalesmanSolution bestSolution) {
+    public void transferSolutions(SalesmanSolution bestSolution) {
     }
 
     public void produceGeneration() {

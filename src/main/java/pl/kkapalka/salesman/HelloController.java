@@ -4,12 +4,16 @@ import javafx.fxml.FXML;
 import pl.kkapalka.salesman.logic.calcMode.SalesmanSolutionCalculator;
 import pl.kkapalka.salesman.logic.calcMode.CalculationModeSelector;
 import pl.kkapalka.salesman.logic.calcMode.SalesmanCalculatorCallback;
+import pl.kkapalka.salesman.models.SalesmanSolution;
+import java.util.stream.Collectors;
+import java.util.List;
 
 public class HelloController implements SalesmanCalculatorCallback {
 
     boolean calculating = false;
     SalesmanSolutionCalculator calculator;
     int generation = 0;
+    List<SalesmanSolution> solutions;
 
     @FXML
     protected void toggleCalculations() {
@@ -31,9 +35,9 @@ public class HelloController implements SalesmanCalculatorCallback {
     }
 
     @Override
-    public void onCollectLastGeneration(pl.kkapalka.salesman.models.SalesmanSolution[] solutions) {
+    public void onCollectLastGeneration(List<SalesmanSolution> solutions) {
         System.out.println("generation "+generation);
-        System.out.println(solutions.length);
-        System.out.println(java.util.Arrays.stream(solutions).map(solution -> solution.getTotalTravelCost()).collect(java.util.stream.Collectors.toList()));
+        System.out.println(solutions.size());
+        System.out.println(solutions.stream().map(SalesmanSolution::getTotalTravelCost).collect(Collectors.toList()));
     }
 }

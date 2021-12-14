@@ -8,6 +8,7 @@ Changelog:
   * Solver can now be started and stopped at will
   * Transferred the logic for displaying generation data inside the controller itself, instead of inside solvers. This way data can be used for the purpose of display.
   * Upon finishing the calculations, travel path costs of the top 50 unique specimen of last generation are displayed in console. If needed, their whole inner data can me access, including the gene and the calculated travel path.
+  * Did minor readability improvements.
 
 * 13.12.2021
   * Moved the data about joining point to CityNetworkSingleton since it is a constant

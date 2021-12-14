@@ -1,10 +1,15 @@
 package pl.kkapalka.salesman;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
+import java.util.function.Function;
+
 public class HelperMethods {
 
-    public static <T> java.util.function.Predicate<T> distinctByKey(java.util.function.Function<? super T, Object> keyExtractor)
+    public static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor)
     {
-        java.util.Map<Object, Boolean> map = new java.util.concurrent.ConcurrentHashMap<>();
+        Map<Object, Boolean> map = new ConcurrentHashMap<>();
         return t -> map.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
 }
