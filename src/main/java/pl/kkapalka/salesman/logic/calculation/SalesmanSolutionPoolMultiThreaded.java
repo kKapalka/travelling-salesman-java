@@ -16,7 +16,6 @@ public class SalesmanSolutionPoolMultiThreaded implements SalesmanSolutionCallba
     private final SalesmanThreadPooled[] salesmanThreads;
     private ArrayList<SalesmanSolution> salesmanSolutionArrayList;
     AtomicInteger waitingThreads = new AtomicInteger(0);
-    boolean calculating = false;
     SalesmanCalculatorCallback callback;
 
     public SalesmanSolutionPoolMultiThreaded(SalesmanCalculatorCallback callback) {
@@ -28,12 +27,12 @@ public class SalesmanSolutionPoolMultiThreaded implements SalesmanSolutionCallba
         salesmanSolutionArrayList = new ArrayList<>();
     }
 
-    public void startCalculations() {
+    public void startCalculation() {
         for (SalesmanThreadPooled salesmanThread : salesmanThreads) {
             salesmanThread.start();
         }
     }
-    public void stopCalculations() {
+    public void stopCalculation() {
         for (SalesmanThreadPooled salesmanThread : salesmanThreads) {
             salesmanThread.cease();
             try {
@@ -42,16 +41,7 @@ public class SalesmanSolutionPoolMultiThreaded implements SalesmanSolutionCallba
                 e.printStackTrace();
             }
         }
-    }
-
-    public void toggleCalculation() {
-        if(calculating) {
-            stopCalculations();
-            calculating = false;
-        } else {
-            startCalculations();
-            calculating = true;
-        }
+        callback.onCollectLastGeneration(salesmanSolutionArrayList.stream().sorted(SalesmanSolution::compareTo).toArray(SalesmanSolution[]::new));
     }
 
     @Override

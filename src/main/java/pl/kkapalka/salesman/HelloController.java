@@ -15,9 +15,11 @@ public class HelloController implements SalesmanCalculatorCallback {
     protected void toggleCalculations() {
         if(!calculating) {
             generation = 0;
-            calculator = CalculationModeSelector.SINGLE_THREADED.createCalculator(this);
+            calculator = CalculationModeSelector.MULTI_THREADED.createCalculator(this);
+            calculator.startCalculation();
+        } else {
+            calculator.stopCalculation();
         }
-        calculator.toggleCalculation();
         calculating = !calculating;
     }
 
@@ -31,5 +33,7 @@ public class HelloController implements SalesmanCalculatorCallback {
     @Override
     public void onCollectLastGeneration(pl.kkapalka.salesman.models.SalesmanSolution[] solutions) {
         System.out.println("generation "+generation);
+        System.out.println(solutions.length);
+        System.out.println(java.util.Arrays.stream(solutions).map(solution -> solution.getTotalTravelCost()).collect(java.util.stream.Collectors.toList()));
     }
 }

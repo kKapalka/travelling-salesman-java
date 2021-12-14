@@ -1,5 +1,6 @@
 package pl.kkapalka.salesman.logic.calcMode;
 
 public interface SalesmanSolutionCalculator {
-    void toggleCalculation();
+    void startCalculation();
+    void stopCalculation();
 }

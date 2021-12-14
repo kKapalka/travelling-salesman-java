@@ -3,10 +3,12 @@ import pl.kkapalka.salesman.logic.calcMode.SalesmanSolutionCalculator;
 import pl.kkapalka.salesman.logic.calcMode.SalesmanCalculatorCallback;
 import pl.kkapalka.salesman.models.SalesmanSolution;
 
+import java.util.ArrayList;
+
+import static pl.kkapalka.salesman.HelperMethods.distinctByKey;
+
 public class SalesmanSolutionPoolSingleThreaded implements SalesmanSolutionCalculator, SalesmanSolutionCallback {
-    private SalesmanThreadUnpooled thread;
-    int generation;
-    boolean calculating = false;
+    private final SalesmanThreadUnpooled thread;
     SalesmanCalculatorCallback callback;
 
     public SalesmanSolutionPoolSingleThreaded(SalesmanCalculatorCallback callback) {
@@ -14,22 +16,20 @@ public class SalesmanSolutionPoolSingleThreaded implements SalesmanSolutionCalcu
         thread = new SalesmanThreadUnpooled(this);
     }
 
-    public void startCalculations() {
+    public void startCalculation() {
         thread.start();
     }
 
-    public void stopCalculations() {
+    public void stopCalculation() {
         thread.cease();
-    }
-
-    public void toggleCalculation() {
-        if(calculating) {
-            stopCalculations();
-            calculating = false;
-        } else {
-            startCalculations();
-            calculating = true;
+        ArrayList<SalesmanSolution> sortedList = java.util.Arrays.stream(thread.salesmanSolutions)
+                .sorted(SalesmanSolution::compareTo)
+                .filter(distinctByKey(SalesmanSolution::getTotalTravelCost))
+                .limit(50).collect(java.util.stream.Collectors.toCollection(java.util.ArrayList::new));
+        for(int i= sortedList.size(); i < thread.salesmanSolutions.length / 2; i++) {
+            sortedList.add(sortedList.get(0));
         }
+        callback.onCollectLastGeneration(sortedList.stream().sorted(SalesmanSolution::compareTo).toArray(SalesmanSolution[]::new));
     }
 
     @Override
