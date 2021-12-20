@@ -18,4 +18,8 @@ public enum CalculationModeSelector {
     };
 
     public abstract SalesmanSolutionCalculator createCalculator(SalesmanCalculatorCallback callback);
+
+    public static CalculationModeSelector getCalculatorBasedOnCheckbox(boolean multithreaded) {
+        return multithreaded ? MULTI_THREADED : SINGLE_THREADED;
+    }
 }

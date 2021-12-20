@@ -14,6 +14,8 @@ Changelog:
   * Minor bugfixes 
   * Cleanup of numeric input callbacks
   * Modification of number of cities can invalidate the position of a joining point
+  * Upon starting calculations, all inputs are disabled. Upon stopping, all inputs are enabled
+
 
 * 14.12.2021
   * Solver can now be started and stopped at will

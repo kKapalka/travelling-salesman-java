@@ -17,6 +17,7 @@ public class HelloController implements SalesmanCalculatorCallback {
     boolean calculating = false;
     SalesmanSolutionCalculator calculator;
     int generation = 0;
+    CityNetworkSingleton singleton;
     List<SalesmanSolution> solutions;
 
     @FXML
@@ -40,7 +41,55 @@ public class HelloController implements SalesmanCalculatorCallback {
 
     @FXML
     public void initialize() {
-        CityNetworkSingleton singleton = CityNetworkSingleton.getInstance();
+        singleton = CityNetworkSingleton.getInstance();
+        setUpSettingsPage();
+    }
+
+    @FXML
+    protected void toggleCalculations() {
+        calculating = !calculating;
+        if(calculating) {
+            generation = 0;
+            calculator = CalculationModeSelector.getCalculatorBasedOnCheckbox(multithreadedSolverCheckbox.isSelected()).createCalculator(this);
+            calculator.startCalculation();
+            toggleAllInputs();
+            startCalculationsButton.setText("Stop Calculations");
+        } else {
+            calculator.stopCalculation();
+            toggleAllInputs();
+            startCalculationsButton.setText("Start Calculations");
+        }
+    }
+
+    private void validateStartButton() {
+        startCalculationsButton.setDisable(!(joiningPointInputValid
+                && specimenCountInputValid && cityCountInputValid
+                && (threadNumberInputValid || !multithreadedSolverCheckbox.isSelected())));
+    }
+
+    @Override
+    public void onTransmitGraphData(Long minimumCost, Double averageCost) {
+        System.out.println("minimum cost - "+minimumCost);
+        System.out.println("average cost - "+averageCost);
+        generation++;
+    }
+
+    @Override
+    public void onCollectLastGeneration(List<SalesmanSolution> solutions) {
+        System.out.println("generation "+generation);
+        System.out.println(solutions.size());
+        System.out.println(solutions.stream().map(SalesmanSolution::getTotalTravelCost).collect(Collectors.toList()));
+    }
+
+    private void toggleAllInputs() {
+        numberOfThreadsInput.setDisable(calculating);
+        cityCountInput.setDisable(calculating);
+        specimenCountInput.setDisable(calculating);
+        joiningPointInput.setDisable(calculating);
+        multithreadedSolverCheckbox.setDisable(calculating);
+    }
+
+    private void setUpSettingsPage() {
         NumericChangeListener joiningPointInputListener = new NumericChangeListener(joiningPointInput,
                 1, singleton.getCityGridSize(), singleton::setJoiningPoint, change -> {
             joiningPointInputValid = change;
@@ -70,41 +119,10 @@ public class HelloController implements SalesmanCalculatorCallback {
         }));
         joiningPointInput.setText(singleton.getJoiningPoint().toString());
         joiningPointInput.textProperty().addListener(joiningPointInputListener);
-    }
-
-    @FXML
-    protected void toggleCalculations() {
-        if(!calculating) {
-            generation = 0;
-            if(multithreadedSolverCheckbox.isSelected()) {
-                calculator = CalculationModeSelector.MULTI_THREADED.createCalculator(this);
-            } else {
-                calculator = CalculationModeSelector.SINGLE_THREADED.createCalculator(this);
-            }
-            calculator.startCalculation();
-        } else {
-            calculator.stopCalculation();
-        }
-        calculating = !calculating;
-    }
-
-    private void validateStartButton() {
-        startCalculationsButton.setDisable(!(joiningPointInputValid
-                && specimenCountInputValid && cityCountInputValid
-                && (threadNumberInputValid || !multithreadedSolverCheckbox.isSelected())));
-    }
-
-    @Override
-    public void onTransmitGraphData(Long minimumCost, Double averageCost) {
-        System.out.println("minimum cost - "+minimumCost);
-        System.out.println("average cost - "+averageCost);
-        generation++;
-    }
-
-    @Override
-    public void onCollectLastGeneration(List<SalesmanSolution> solutions) {
-        System.out.println("generation "+generation);
-        System.out.println(solutions.size());
-        System.out.println(solutions.stream().map(SalesmanSolution::getTotalTravelCost).collect(Collectors.toList()));
+        multithreadedSolverCheckbox.selectedProperty().addListener((observable, oldV, newV) -> {
+            validateStartButton();
+            numberOfThreadsInput.setDisable(!newV);
+        });
+        multithreadedSolverCheckbox.setSelected(true);
     }
 }
