@@ -31,7 +31,7 @@ public class SalesmanSolution implements Comparable {
      * @param emptyOnBirth if true, the gene starts out empty
      */
     public SalesmanSolution(boolean emptyOnBirth) {
-        this.travelRouteGene = new int[CityNetworkSingleton.getCityGridSize()];
+        this.travelRouteGene = new int[CityNetworkSingleton.getInstance().getCityGridSize()];
         if(!emptyOnBirth) {
             for (short i=0;i<travelRouteGene.length; i++) {
                 this.travelRouteGene[i] = random.nextInt(255);
@@ -49,7 +49,7 @@ public class SalesmanSolution implements Comparable {
      */
     void takeInParentInformation(SalesmanSolution parent1, SalesmanSolution parent2, int joiningPoint) {
         System.arraycopy(parent1.getTravelRouteGene(), 0, travelRouteGene, 0, joiningPoint);
-        System.arraycopy(parent2.getTravelRouteGene(), joiningPoint, travelRouteGene, joiningPoint, 100 - joiningPoint);
+        System.arraycopy(parent2.getTravelRouteGene(), joiningPoint, travelRouteGene, joiningPoint, CityNetworkSingleton.getInstance().getCityGridSize() - joiningPoint);
         calculateTotalTravelCost();
     }
 
@@ -63,8 +63,8 @@ public class SalesmanSolution implements Comparable {
      * @throws IllegalStateException if the joining point is outside of bounds (0 - cityGridSize)
      */
     public SalesmanSolution produceOffspring(SalesmanSolution other, int joiningPoint) throws IllegalStateException {
-        if(joiningPoint >= CityNetworkSingleton.getCityGridSize() || joiningPoint < 0) {
-            throw new IllegalStateException("Joining point must have value between 0 and " + CityNetworkSingleton.getCityGridSize());
+        if(joiningPoint >= CityNetworkSingleton.getInstance().getCityGridSize() || joiningPoint < 0) {
+            throw new IllegalStateException("Joining point must have value between 0 and " + CityNetworkSingleton.getInstance().getCityGridSize());
         }
         SalesmanSolution offspring = new SalesmanSolution(true);
         offspring.takeInParentInformation(this, other, joiningPoint);
@@ -76,7 +76,7 @@ public class SalesmanSolution implements Comparable {
      * On firing the mutation method, the travel cost is re-calculated.
      */
     public void mutate() {
-        this.travelRouteGene[random.nextInt(CityNetworkSingleton.getCityGridSize())] = random.nextInt(255);
+        this.travelRouteGene[random.nextInt(CityNetworkSingleton.getInstance().getCityGridSize())] = random.nextInt(255);
         this.calculateTotalTravelCost();
     }
 
@@ -91,10 +91,10 @@ public class SalesmanSolution implements Comparable {
         Integer[][] travelCostArray = CityNetworkSingleton.getInstance().getCityTravelCostGrid();
         travelRoute = calculateRoute();
         Long sum = 0L;
-        for(int i=1;i<CityNetworkSingleton.getCityGridSize();i++) {
+        for(int i=1;i<CityNetworkSingleton.getInstance().getCityGridSize();i++) {
             sum += travelCostArray[travelRoute[i-1]][travelRoute[i]];
         }
-        sum += travelCostArray[CityNetworkSingleton.getCityGridSize()-1][0];
+        sum += travelCostArray[CityNetworkSingleton.getInstance().getCityGridSize()-1][0];
         this.totalTravelCost = sum;
     }
 
@@ -106,7 +106,7 @@ public class SalesmanSolution implements Comparable {
             }
             regroupedCityRanking[this.travelRouteGene[i]].add(i);
         }
-        int[] route = new int[CityNetworkSingleton.getCityGridSize()];
+        int[] route = new int[CityNetworkSingleton.getInstance().getCityGridSize()];
         int routeIterator = 0;
         for (java.util.ArrayList<Integer> integers : regroupedCityRanking) {
             if (integers != null) {

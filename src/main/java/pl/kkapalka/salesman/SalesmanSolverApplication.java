@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.scene.Group;
+import pl.kkapalka.salesman.models.CityNetworkSingleton;
 
 import java.io.IOException;
 

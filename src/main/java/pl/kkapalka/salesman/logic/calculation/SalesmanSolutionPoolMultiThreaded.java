@@ -20,9 +20,9 @@ public class SalesmanSolutionPoolMultiThreaded implements SalesmanSolutionCallba
 
     public SalesmanSolutionPoolMultiThreaded(SalesmanCalculatorCallback callback) {
         this.callback = callback;
-        salesmanThreads = new SalesmanThreadPooled[CityNetworkSingleton.getTotalThreadAmount()];
+        salesmanThreads = new SalesmanThreadPooled[CityNetworkSingleton.getInstance().getTotalThreadAmount()];
         for(int i=0;i<salesmanThreads.length; i++) {
-            salesmanThreads[i] = new SalesmanThreadPooled(this, CityNetworkSingleton.getTotalThreadAmount());
+            salesmanThreads[i] = new SalesmanThreadPooled(this, CityNetworkSingleton.getInstance().getTotalThreadAmount());
         }
         salesmanSolutionArrayList = new ArrayList<>();
     }
@@ -58,7 +58,7 @@ public class SalesmanSolutionPoolMultiThreaded implements SalesmanSolutionCallba
 
     public void produceGeneration() {
         this.waitingThreads.set(0);
-        int halfPopulation = CityNetworkSingleton.getTotalSolutionsPerGeneration() / 2;
+        int halfPopulation = CityNetworkSingleton.getInstance().getTotalSolutionsPerGeneration() / 2;
         this.salesmanSolutionArrayList = Arrays.stream(this.salesmanThreads)
                 .flatMap(thread -> Stream.of(thread.solutionArray))
                 .sorted(SalesmanSolution::compareTo)

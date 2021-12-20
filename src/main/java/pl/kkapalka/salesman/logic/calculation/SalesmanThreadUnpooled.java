@@ -18,7 +18,7 @@ public class SalesmanThreadUnpooled extends Thread{
     SalesmanSolutionCallback callback;
 
     public SalesmanThreadUnpooled(SalesmanSolutionCallback callback) {
-        this.salesmanSolutions = new SalesmanSolution[CityNetworkSingleton.getTotalSolutionsPerGeneration()];
+        this.salesmanSolutions = new SalesmanSolution[CityNetworkSingleton.getInstance().getTotalSolutionsPerGeneration()];
         this.callback = callback;
     }
 
@@ -41,7 +41,7 @@ public class SalesmanThreadUnpooled extends Thread{
         ArrayList<SalesmanSolution> sortedList = Arrays.stream(salesmanSolutions)
                 .sorted(SalesmanSolution::compareTo)
                 .filter(distinctByKey(SalesmanSolution::getTotalTravelCost))
-                .limit(50).collect(Collectors.toCollection(java.util.ArrayList::new));
+                .limit(CityNetworkSingleton.getInstance().getTotalSolutionsPerGeneration() / 2).collect(Collectors.toCollection(java.util.ArrayList::new));
         for(int i= sortedList.size(); i < salesmanSolutions.length / 2; i++) {
             sortedList.add(sortedList.get(0));
         }
@@ -55,12 +55,12 @@ public class SalesmanThreadUnpooled extends Thread{
     private void createNewGeneration() {
         int halfLength = salesmanSolutions.length / 2;
         for(int i=0;i<salesmanSolutions.length / 2; i+=2) {
-            salesmanSolutions[i + halfLength] = salesmanSolutions[i].produceOffspring(salesmanSolutions[i+1], pl.kkapalka.salesman.models.CityNetworkSingleton.getJoiningPoint());
-            salesmanSolutions[i + halfLength + 1] = salesmanSolutions[i+1].produceOffspring(salesmanSolutions[i], pl.kkapalka.salesman.models.CityNetworkSingleton.getJoiningPoint());
+            salesmanSolutions[i + halfLength] = salesmanSolutions[i].produceOffspring(salesmanSolutions[i+1], CityNetworkSingleton.getInstance().getJoiningPoint());
+            salesmanSolutions[i + halfLength + 1] = salesmanSolutions[i+1].produceOffspring(salesmanSolutions[i], CityNetworkSingleton.getInstance().getJoiningPoint());
         }
 
         if(salesmanSolutions.length % 2 != 0) {
-            salesmanSolutions[salesmanSolutions.length - 1] = salesmanSolutions[1].produceOffspring(salesmanSolutions[salesmanSolutions.length - 2], pl.kkapalka.salesman.models.CityNetworkSingleton.getJoiningPoint());
+            salesmanSolutions[salesmanSolutions.length - 1] = salesmanSolutions[1].produceOffspring(salesmanSolutions[salesmanSolutions.length - 2], CityNetworkSingleton.getInstance().getJoiningPoint());
         }
         for(int i=0;i< salesmanSolutions.length / 10; i++) {
             salesmanSolutions[random.nextInt(salesmanSolutions.length)].mutate();

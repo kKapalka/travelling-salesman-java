@@ -2,6 +2,7 @@ package pl.kkapalka.salesman.logic.calculation;
 import pl.kkapalka.salesman.logic.calcMode.SalesmanSolutionCalculator;
 import pl.kkapalka.salesman.logic.calcMode.SalesmanCalculatorCallback;
 import pl.kkapalka.salesman.models.SalesmanSolution;
+import pl.kkapalka.salesman.models.CityNetworkSingleton;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -27,11 +28,16 @@ public class SalesmanSolutionPoolSingleThreaded implements SalesmanSolutionCalcu
         ArrayList<SalesmanSolution> sortedList = Arrays.stream(thread.salesmanSolutions)
                 .sorted(SalesmanSolution::compareTo)
                 .filter(distinctByKey(SalesmanSolution::getTotalTravelCost))
-                .limit(50).collect(Collectors.toCollection(ArrayList::new));
+                .limit(CityNetworkSingleton.getInstance().getTotalSolutionsPerGeneration() / 2).collect(Collectors.toCollection(ArrayList::new));
         for(int i= sortedList.size(); i < thread.salesmanSolutions.length / 2; i++) {
             sortedList.add(sortedList.get(0));
         }
         callback.onCollectLastGeneration(sortedList.stream().sorted(SalesmanSolution::compareTo).collect(Collectors.toList()));
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

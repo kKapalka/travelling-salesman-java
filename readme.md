@@ -4,6 +4,15 @@ Implementation of a solver of the Travelling Salesman problem, using genetic alg
 
 Changelog:
 
+* 20.12.2021
+  * User can now set his own values for:
+    * Number of threads used for multithreaded solver (between 2 and 10)
+    * Number of specimens per generation (5 - 999)
+    * Number of cities (5 - 999)
+    * Joining point (1 - number of cities)
+  * On manual change of number of cities, the new city grid is automatically generated
+  * Minor bugfixes 
+
 * 14.12.2021
   * Solver can now be started and stopped at will
   * Transferred the logic for displaying generation data inside the controller itself, instead of inside solvers. This way data can be used for the purpose of display.

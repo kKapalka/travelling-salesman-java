@@ -14,7 +14,7 @@ public class SalesmanThreadPooled extends Thread {
     AtomicBoolean complete = new AtomicBoolean(false);
 
     public SalesmanThreadPooled(SalesmanSolutionCallback callback, int threadNumber) {
-        this.solutionArray = new SalesmanSolution[CityNetworkSingleton.getTotalSolutionsPerGeneration() / threadNumber];
+        this.solutionArray = new SalesmanSolution[CityNetworkSingleton.getInstance().getTotalSolutionsPerGeneration() / threadNumber];
         this.callback = callback;
     }
 
@@ -57,11 +57,11 @@ public class SalesmanThreadPooled extends Thread {
     private void createNewGeneration() {
         int halfLength = solutionArray.length / 2;
         for(int i=1;i<halfLength; i+=2) {
-            solutionArray[i + halfLength] = solutionArray[i].produceOffspring(solutionArray[i-1], CityNetworkSingleton.getJoiningPoint());
-            solutionArray[i + halfLength - 1] = solutionArray[i-1].produceOffspring(solutionArray[i], CityNetworkSingleton.getJoiningPoint());
+            solutionArray[i + halfLength] = solutionArray[i].produceOffspring(solutionArray[i-1], CityNetworkSingleton.getInstance().getJoiningPoint());
+            solutionArray[i + halfLength - 1] = solutionArray[i-1].produceOffspring(solutionArray[i], CityNetworkSingleton.getInstance().getJoiningPoint());
         }
         if(solutionArray.length % 2 != 0) {
-            solutionArray[solutionArray.length - 1] = solutionArray[1].produceOffspring(solutionArray[solutionArray.length - 2], CityNetworkSingleton.getJoiningPoint());
+            solutionArray[solutionArray.length - 1] = solutionArray[1].produceOffspring(solutionArray[solutionArray.length - 2], CityNetworkSingleton.getInstance().getJoiningPoint());
         }
         for(int i=0;i<solutionArray.length; i+=10) {
             solutionArray[random.nextInt(solutionArray.length)].mutate();

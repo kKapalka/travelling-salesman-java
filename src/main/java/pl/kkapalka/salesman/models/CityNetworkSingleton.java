@@ -5,11 +5,11 @@ import java.util.Random;
 public final class CityNetworkSingleton {
     private static CityNetworkSingleton instance;
     
-    private static final Integer CITY_GRID_SIZE = 100;
-    private static final Integer JOINING_POINT = 50;
-    private static final Integer TOTAL_SOLUTIONS_PER_GENERATION = 100;
-    private static final Integer TOTAL_THREAD_AMOUNT = 5;
-    private static final Random random = new Random();
+    private Integer CITY_GRID_SIZE = 100;
+    private Integer JOINING_POINT = 50;
+    private Integer TOTAL_SOLUTIONS_PER_GENERATION = 100;
+    private Integer TOTAL_THREAD_AMOUNT = 5;
+    private final Random random = new Random();
 
     private Integer[][] cityTravelCostGrid;
     private Boolean symmetryConstaint = true;
@@ -79,8 +79,17 @@ public final class CityNetworkSingleton {
      * Getter for the constant value of the city grid size - the total amount of cities
      * @return city grid size
      */
-    public static Integer getCityGridSize() {
+    public Integer getCityGridSize() {
         return CITY_GRID_SIZE;
+    }
+
+    /**
+     * Setter for the constant value of the city grid size - the total amount of cities
+     * @param cityGridSize city grid size
+     */
+    public void setCityGridSize(Integer cityGridSize) {
+        this.CITY_GRID_SIZE = cityGridSize;
+        this.generateNewGrid();
     }
 
     /**
@@ -96,24 +105,48 @@ public final class CityNetworkSingleton {
      * getting information from one parent and starts from another
      * @return joining point
      */
-    public static Integer getJoiningPoint() {
+    public Integer getJoiningPoint() {
         return JOINING_POINT;
     }
 
     /**
+     * Setter for the joining point
+     * @param joiningPoint joining point
+     */
+    public void setJoiningPoint(Integer joiningPoint) {
+        this.JOINING_POINT = joiningPoint;
+    }
+    /**
      * Getter for the amount of solutions per each generation
      * @return total solutions per generation
      */
-    public static Integer getTotalSolutionsPerGeneration() {
+    public Integer getTotalSolutionsPerGeneration() {
         return TOTAL_SOLUTIONS_PER_GENERATION;
+    }
+
+
+    /**
+     * Setter for the totalSolutionsPerGeneration
+     * @param totalSolutionsPerGeneration totalSolutionsPerGeneration
+     */
+    public void setTotalSolutionsPerGeneration(Integer totalSolutionsPerGeneration) {
+        this.TOTAL_SOLUTIONS_PER_GENERATION = totalSolutionsPerGeneration;
     }
 
     /**
      * Getter for the amount of threads for multi-threaded solver
      * @return total thread amount
      */
-    public static Integer getTotalThreadAmount() {
+    public Integer getTotalThreadAmount() {
         return TOTAL_THREAD_AMOUNT;
+    }
+
+    /**
+     * Setter for the totalSolutionsPerGeneration
+     * @param totalThreadAmount totalThreadAmount
+     */
+    public void setTotalThreadAmount(Integer totalThreadAmount) {
+        this.TOTAL_THREAD_AMOUNT = totalThreadAmount;
     }
 
     /**
