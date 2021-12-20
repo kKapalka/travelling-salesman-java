@@ -7,7 +7,7 @@ import pl.kkapalka.salesman.logic.calcMode.SalesmanCalculatorCallback;
 import pl.kkapalka.salesman.models.SalesmanSolution;
 import java.util.stream.Collectors;
 import javafx.scene.control.TextField;
-import pl.kkapalka.salesman.NumericChangeListener;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Button;
 import pl.kkapalka.salesman.models.CityNetworkSingleton;
 import java.util.List;
@@ -27,6 +27,8 @@ public class HelloController implements SalesmanCalculatorCallback {
     protected TextField specimenCountInput;
     @FXML
     protected TextField joiningPointInput;
+    @FXML
+    public CheckBox multithreadedSolverCheckbox;
 
     @FXML
     public Button startCalculationsButton;
@@ -39,65 +41,46 @@ public class HelloController implements SalesmanCalculatorCallback {
     @FXML
     public void initialize() {
         CityNetworkSingleton singleton = CityNetworkSingleton.getInstance();
+        NumericChangeListener joiningPointInputListener = new NumericChangeListener(joiningPointInput,
+                1, singleton.getCityGridSize(), singleton::setJoiningPoint, change -> {
+            joiningPointInputValid = change;
+            validateStartButton();
+        });
         cityCountInput.setText(singleton.getCityGridSize().toString());
-        cityCountInput.textProperty().addListener(new NumericChangeListener(cityCountInput, text -> {
-            boolean inputValid = false;
-            if(!text.isBlank()) {
-                int value = Integer.parseInt(text);
-                if(value > 4 && value < 1000) {
-                    inputValid = true;
-                    singleton.setCityGridSize(value);
-                }
-            }
-            cityCountInputValid = inputValid;
+        cityCountInput.textProperty().addListener(new NumericChangeListener(cityCountInput,
+                5, 999, value -> {
+            singleton.setCityGridSize(value);
+            joiningPointInputListener.maximumValue = value;
+        }, change -> {
+            joiningPointInputListener.check();
+            cityCountInputValid = change;
             validateStartButton();
         }));
         numberOfThreadsInput.setText(singleton.getTotalThreadAmount().toString());
-        numberOfThreadsInput.textProperty().addListener(new NumericChangeListener(numberOfThreadsInput, text -> {
-            boolean inputValid = false;
-            if(!text.isBlank()) {
-                int value = Integer.parseInt(text);
-                if(value > 1 && value < 10) {
-                    inputValid = true;
-                    singleton.setTotalThreadAmount(value);
-                }
-            }
-            threadNumberInputValid = inputValid;
+        numberOfThreadsInput.textProperty().addListener(new NumericChangeListener(numberOfThreadsInput,
+                2, 10, singleton::setTotalThreadAmount, change -> {
+            threadNumberInputValid = change;
             validateStartButton();
         }));
         specimenCountInput.setText(singleton.getTotalSolutionsPerGeneration().toString());
-        specimenCountInput.textProperty().addListener(new NumericChangeListener(specimenCountInput, text -> {
-            boolean inputValid = false;
-            if(!text.isBlank()) {
-                int value = Integer.parseInt(text);
-                if(value > 4 && value < 1000) {
-                    inputValid = true;
-                    singleton.setTotalSolutionsPerGeneration(value);
-                }
-            }
-            specimenCountInputValid = inputValid;
+        specimenCountInput.textProperty().addListener(new NumericChangeListener(specimenCountInput,
+                5, 999, singleton::setTotalSolutionsPerGeneration, change -> {
+            specimenCountInputValid = change;
             validateStartButton();
         }));
         joiningPointInput.setText(singleton.getJoiningPoint().toString());
-        joiningPointInput.textProperty().addListener(new NumericChangeListener(joiningPointInput, text -> {
-            boolean inputValid = false;
-            if(!text.isBlank()) {
-                int value = Integer.parseInt(text);
-                if(value > 0 && value < singleton.getCityGridSize()) {
-                    inputValid = true;
-                    singleton.setJoiningPoint(value);
-                }
-            }
-            joiningPointInputValid = inputValid;
-            validateStartButton();
-        }));
+        joiningPointInput.textProperty().addListener(joiningPointInputListener);
     }
 
     @FXML
     protected void toggleCalculations() {
         if(!calculating) {
             generation = 0;
-            calculator = CalculationModeSelector.MULTI_THREADED.createCalculator(this);
+            if(multithreadedSolverCheckbox.isSelected()) {
+                calculator = CalculationModeSelector.MULTI_THREADED.createCalculator(this);
+            } else {
+                calculator = CalculationModeSelector.SINGLE_THREADED.createCalculator(this);
+            }
             calculator.startCalculation();
         } else {
             calculator.stopCalculation();
@@ -106,7 +89,9 @@ public class HelloController implements SalesmanCalculatorCallback {
     }
 
     private void validateStartButton() {
-        startCalculationsButton.setDisable(!(joiningPointInputValid && specimenCountInputValid && cityCountInputValid && threadNumberInputValid));
+        startCalculationsButton.setDisable(!(joiningPointInputValid
+                && specimenCountInputValid && cityCountInputValid
+                && (threadNumberInputValid || !multithreadedSolverCheckbox.isSelected())));
     }
 
     @Override

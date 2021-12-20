@@ -12,6 +12,8 @@ Changelog:
     * Joining point (1 - number of cities)
   * On manual change of number of cities, the new city grid is automatically generated
   * Minor bugfixes 
+  * Cleanup of numeric input callbacks
+  * Modification of number of cities can invalidate the position of a joining point
 
 * 14.12.2021
   * Solver can now be started and stopped at will

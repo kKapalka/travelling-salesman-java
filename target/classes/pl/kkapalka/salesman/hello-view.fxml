@@ -20,11 +20,11 @@
                         <TextField fx:id="numberOfThreadsInput" layoutX="21.0" layoutY="56.0" prefHeight="25.0" prefWidth="50.0" />
                         <TextField fx:id="specimenCountInput" layoutX="21.0" layoutY="99.0" prefHeight="25.0" prefWidth="49.0" />
                         <CheckBox fx:id="multithreadedSolverCheckbox" layoutX="21.0" layoutY="24.0" mnemonicParsing="false" text="Solve using multi-threaded solver" />
-                        <Label layoutX="80.0" layoutY="60.0" text="Number of threads used by multi-threaded solver" />
-                        <Label layoutX="80.0" layoutY="103.0" text="Number of specimens per generation" />
-                        <Label layoutX="80.0" layoutY="148.0" text="Number of cities" />
+                        <Label layoutX="80.0" layoutY="60.0" text="Number of threads used by multi-threaded solver (2 - 10)" />
+                        <Label layoutX="80.0" layoutY="103.0" text="Number of specimens per generation (5 - 999)" />
+                        <Label layoutX="80.0" layoutY="148.0" text="Number of cities (5 - 999)" />
                         <TextField fx:id="joiningPointInput" layoutX="21.0" layoutY="197.0" prefHeight="25.0" prefWidth="50.0" />
-                        <Label layoutX="80.0" layoutY="187.0" prefHeight="45.0" prefWidth="298.0" text="Joining point of the chromosomes for the purpose of offspring production (between 1 and number of cities)" wrapText="true" />
+                        <Label layoutX="80.0" layoutY="187.0" prefHeight="45.0" prefWidth="298.0" text="Joining point of the chromosomes for the purpose of offspring production (1 and number of cities)" wrapText="true" />
                      </children></AnchorPane>
                 </content>
             </Tab>
