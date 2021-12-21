@@ -5,7 +5,6 @@ import pl.kkapalka.salesman.logic.calcMode.SalesmanSolutionCalculator;
 import pl.kkapalka.salesman.logic.calcMode.CalculationModeSelector;
 import pl.kkapalka.salesman.logic.calcMode.SalesmanCalculatorCallback;
 import pl.kkapalka.salesman.models.SalesmanSolution;
-import java.util.stream.Collectors;
 import javafx.scene.control.TextField;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Button;
@@ -57,11 +56,21 @@ public class HelloController implements SalesmanCalculatorCallback {
     @FXML
     public GridPane sideCityNameGrid;
     @FXML
+    public GridPane resultsGrid;
+    @FXML
+    public Label resultsLabel;
+    @FXML
+    public GridPane resultDetailsGridView;
+    @FXML
+    public Label resultDetailsLabel;
+    @FXML
     public javafx.scene.chart.LineChart<Number, Number> progressChart;
     @FXML
     public javafx.scene.chart.NumberAxis generationNumberAxis;
     @FXML
     public javafx.scene.chart.NumberAxis travelCostAxis;
+    @FXML
+    public javafx.scene.control.TabPane mainTabPane;
 
 
     @FXML
@@ -87,27 +96,29 @@ public class HelloController implements SalesmanCalculatorCallback {
         setUpSettingsPage();
         setUpCitiesPage();
         setUpProgressChartPage();
-
-        travelCostAxis.setUpperBound(singleton.getCityGridSize() * 470);
-        travelCostAxis.setForceZeroInRange(false);
-        generationNumberAxis.setForceZeroInRange(false);
-        travelCostAxis.setLowerBound(singleton.getCityGridSize() * 100);
     }
 
     @FXML
     protected void toggleCalculations() {
         calculating = !calculating;
         if(calculating) {
+            resultsGrid.getChildren().clear();
+            resultDetailsGridView.getChildren().clear();
+            resultsLabel.setText("");
+            resultDetailsLabel.setText("");
             bestSpecimenSeries.getData().clear();
             averageSpecimenSeries.getData().clear();
             progressChart.setScaleX(1.0);
             progressChart.setScaleY(1.0);
+            mainTabPane.getSelectionModel().select(2);
+            mainTabPane.setDisable(true);
             generation = 1 - singleton.getChartRefreshRate();
             calculator = CalculationModeSelector.getCalculatorBasedOnCheckbox(multithreadedSolverCheckbox.isSelected()).createCalculator(this);
             calculator.startCalculation();
             startCalculationsButton.setText("Stop Calculations");
         } else {
             calculator.stopCalculation();
+            mainTabPane.setDisable(false);
             startCalculationsButton.setText("Start Calculations");
         }
         toggleAllInputs();
@@ -142,9 +153,11 @@ public class HelloController implements SalesmanCalculatorCallback {
 
     @Override
     public void onCollectLastGeneration(List<SalesmanSolution> solutions, int internalClock) {
-        System.out.println("generation "+generation);
-        System.out.println(solutions.size());
-        System.out.println(solutions.stream().map(SalesmanSolution::getTotalTravelCost).collect(Collectors.toList()));
+        averageSpecimenSeries.getData().add(new javafx.scene.chart.XYChart.Data<>(generation + internalClock, solutions.stream().mapToLong(SalesmanSolution::getTotalTravelCost).average().getAsDouble()));
+        bestSpecimenSeries.getData().add(new javafx.scene.chart.XYChart.Data<>(generation + internalClock, solutions.stream().min(SalesmanSolution::compareTo).get().getTotalTravelCost()));
+        this.solutions = solutions;
+        generation += internalClock;
+        modifyResultsPage();
     }
 
     private void toggleAllInputs() {
@@ -158,7 +171,67 @@ public class HelloController implements SalesmanCalculatorCallback {
     }
 
     private void setUpProgressChartPage() {
+        travelCostAxis.setUpperBound(singleton.getCityGridSize() * 470);
+        travelCostAxis.setForceZeroInRange(false);
+        generationNumberAxis.setForceZeroInRange(false);
+        travelCostAxis.setLowerBound(singleton.getCityGridSize() * 100);
+        bestSpecimenSeries.setName("Best specimen in generation");
+        averageSpecimenSeries.setName("Average specimen in generation");
         progressChart.getData().addAll(bestSpecimenSeries, averageSpecimenSeries);
+    }
+
+    private void modifyResultsPage() {
+        resultsLabel.setText("Results reached after "+generation+" generations:");
+        resultsGrid.getChildren().clear();
+        int resultsGridRowCount = resultsGrid.getRowCount();
+        for(int i=solutions.size(); i < resultsGridRowCount; i++) {
+            resultsGrid.getRowConstraints().remove(0);
+        }
+        for(int i= resultsGridRowCount; i < solutions.size(); i++) {
+            RowConstraints row = new RowConstraints(25);
+            resultsGrid.getRowConstraints().add(row);
+        }
+        int resultDetailsGridAmount = (int)Math.ceil(singleton.getCityGridSize().doubleValue() / 3.0);
+
+        int resultDetailsGridRowCount = resultDetailsGridView.getRowCount();
+        for(int i=resultDetailsGridAmount; i < resultDetailsGridRowCount; i++) {
+            resultDetailsGridView.getRowConstraints().remove(0);
+        }
+        for(int i= resultDetailsGridRowCount; i < resultDetailsGridAmount; i++) {
+            RowConstraints row = new RowConstraints(25);
+            resultDetailsGridView.getRowConstraints().add(row);
+        }
+        resultsGrid.resize(resultsGrid.getWidth(), solutions.size() * 25);
+        resultDetailsGridView.resize(resultDetailsGridView.getWidth(), resultDetailsGridAmount * 25);
+
+        for(int i=0; i < solutions.size(); i++) {
+            Label label = new Label("Travel cost of specimen " + (i + 1) + ": " + solutions.get(i).getTotalTravelCost());
+            label.setPrefHeight(25);
+            label.setPrefWidth(resultsGrid.getWidth());
+
+            label.setOnMousePressed(new TravelRouteMouseEventHandler(i) {
+                @Override
+                public void handle(javafx.scene.input.MouseEvent mouseEvent) {
+                    resultDetailsLabel.setText("Detailed travel route for specimen number " + (index + 1));
+                    int[] travelRoute = solutions.get(index).getTravelRoute();
+                    Integer[][] travelCosts = singleton.getCityTravelCostGrid();
+                    resultDetailsGridView.getChildren().clear();
+                    Label firstDetailLabel = new Label(namePartsFirst[travelRoute[0] / namePartsSecond.length] + namePartsSecond[travelRoute[0] % namePartsSecond.length] + "->");
+                    firstDetailLabel.setPrefHeight(25);
+                    resultDetailsGridView.add(firstDetailLabel, 0, 0);
+                    int j = 1;
+                    for (; j < travelCosts.length - 1; j++) {
+                        Label detailLabel = new Label(namePartsFirst[travelRoute[j] / namePartsSecond.length] + namePartsSecond[travelRoute[j] % namePartsSecond.length] + "(" + travelCosts[travelRoute[j - 1]][travelRoute[j]] + ") ->");
+                        detailLabel.setPrefHeight(25);
+                        resultDetailsGridView.add(detailLabel, j % 3, j / 3);
+                    }
+                    Label lastDetailLabel = new Label(namePartsFirst[travelRoute[j] / namePartsSecond.length] + namePartsSecond[travelRoute[j] % namePartsSecond.length] + "(" + travelCosts[travelRoute[j - 1]][travelRoute[j]] + ")");
+                    lastDetailLabel.setPrefHeight(25);
+                    resultDetailsGridView.add(lastDetailLabel, j % 3, j / 3);
+                }
+            });
+            resultsGrid.add(label, 0, i);
+        }
     }
 
     private void setUpCitiesPage() {

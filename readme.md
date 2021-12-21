@@ -13,6 +13,8 @@ Changelog:
   * Data regarding minimum and average travel costs are now transmitted onto the graph
   * Added internal clock, and graph refresh rate variables, to cut on the amount of data transmitted onto the graph
   * Added forced clear after 30 graph elements appear
+  * Created results page, where all specimens of the final generation are listed, and upon inquiry, detailed route is displayed on the side
+  * Now tab selection is disabled while calculations are going on
 
 * 20.12.2021
   * User can now set his own values for:

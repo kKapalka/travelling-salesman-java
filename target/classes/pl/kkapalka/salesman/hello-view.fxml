@@ -10,7 +10,7 @@
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
    <children>
-      <TabPane prefHeight="400.0" prefWidth="560.0" tabClosingPolicy="UNAVAILABLE">
+      <TabPane fx:id="mainTabPane" prefHeight="400.0" prefWidth="560.0" tabClosingPolicy="UNAVAILABLE">
         <tabs>
             <Tab text="Settings">
                 <content>
@@ -84,7 +84,7 @@
                                  <children>
                                     <ScrollPane fx:id="citiesGridScrollPane" prefHeight="335.0" prefWidth="430.0">
                                       <content>
-                                          <GridPane fx:id="citiesGrid" gridLinesVisible="true" maxHeight="-Infinity" maxWidth="-Infinity" stylesheets="@city_grid.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                          <GridPane fx:id="citiesGrid" gridLinesVisible="true" maxHeight="-Infinity" maxWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                           </GridPane>
                                       </content>
                                     </ScrollPane>
@@ -112,7 +112,39 @@
           </Tab>
             <Tab text="Results">
                 <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Label fx:id="resultsLabel" alignment="CENTER" layoutX="86.0" layoutY="-1.0" prefHeight="51.0" prefWidth="379.0" text="Upon stopping of the calculations of the Travelling Salesman problem, the results will appear here" textAlignment="CENTER" wrapText="true" />
+                        <VBox layoutX="14.0" layoutY="58.0" prefHeight="310.0" prefWidth="240.0">
+                           <children>
+                              <ScrollPane fitToWidth="true" prefHeight="310.0" prefWidth="340.0">
+                                 <content>
+                                    <GridPane fx:id="resultsGrid" prefHeight="300.0" prefWidth="340.0">
+                                      <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                      </columnConstraints>
+                                    </GridPane>
+                                 </content>
+                              </ScrollPane>
+                           </children>
+                        </VBox>
+                        <VBox layoutX="256.0" layoutY="89.0" prefHeight="275.0" prefWidth="305.0">
+                           <children>
+                              <ScrollPane fitToWidth="true" prefHeight="277.0" prefWidth="305.0">
+                                <content>
+                                  <GridPane fx:id="resultDetailsGridView" prefHeight="273.0" prefWidth="302.0">
+                                    <columnConstraints>
+                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    </columnConstraints>
+                                  </GridPane>
+                                </content>
+                              </ScrollPane>
+                           </children>
+                        </VBox>
+                        <Label fx:id="resultDetailsLabel" layoutX="262.0" layoutY="58.0" prefHeight="32.0" prefWidth="293.0" />
+                     </children></AnchorPane>
                 </content>
             </Tab>
         </tabs>

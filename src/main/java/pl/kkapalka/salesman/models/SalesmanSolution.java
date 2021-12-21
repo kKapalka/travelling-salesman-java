@@ -134,6 +134,14 @@ public class SalesmanSolution implements Comparable {
         return totalTravelCost;
     }
 
+    /**
+     * Getter for the travel route
+     * @return travel route
+     */
+    public int[] getTravelRoute() {
+        return travelRoute;
+    }
+
     @Override
     public int compareTo(Object o) {
         int res = 0;
