@@ -191,7 +191,7 @@ public class HelloController implements SalesmanCalculatorCallback {
             RowConstraints row = new RowConstraints(25);
             resultsGrid.getRowConstraints().add(row);
         }
-        int resultDetailsGridAmount = (int)Math.ceil(singleton.getCityGridSize().doubleValue() / 3.0);
+        int resultDetailsGridAmount = (int)Math.ceil((Integer.valueOf(singleton.getCityGridSize() + 1)).doubleValue() / 3.0);
 
         int resultDetailsGridRowCount = resultDetailsGridView.getRowCount();
         for(int i=resultDetailsGridAmount; i < resultDetailsGridRowCount; i++) {
@@ -220,14 +220,14 @@ public class HelloController implements SalesmanCalculatorCallback {
                     firstDetailLabel.setPrefHeight(25);
                     resultDetailsGridView.add(firstDetailLabel, 0, 0);
                     int j = 1;
-                    for (; j < travelCosts.length - 1; j++) {
+                    for (; j < travelCosts.length; j++) {
                         Label detailLabel = new Label(namePartsFirst[travelRoute[j] / namePartsSecond.length] + namePartsSecond[travelRoute[j] % namePartsSecond.length] + "(" + travelCosts[travelRoute[j - 1]][travelRoute[j]] + ") ->");
                         detailLabel.setPrefHeight(25);
                         resultDetailsGridView.add(detailLabel, j % 3, j / 3);
                     }
-                    Label lastDetailLabel = new Label(namePartsFirst[travelRoute[j] / namePartsSecond.length] + namePartsSecond[travelRoute[j] % namePartsSecond.length] + "(" + travelCosts[travelRoute[j - 1]][travelRoute[j]] + ")");
-                    lastDetailLabel.setPrefHeight(25);
-                    resultDetailsGridView.add(lastDetailLabel, j % 3, j / 3);
+                    Label returnDetailLabel = new Label(namePartsFirst[travelRoute[0] / namePartsSecond.length] + namePartsSecond[travelRoute[0] % namePartsSecond.length] + "(" + travelCosts[travelRoute[j-1]][travelRoute[0]] + ")");
+                    returnDetailLabel.setPrefHeight(25);
+                    resultDetailsGridView.add(returnDetailLabel, j % 3, j / 3);
                 }
             });
             resultsGrid.add(label, 0, i);
