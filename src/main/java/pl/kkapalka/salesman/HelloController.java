@@ -22,6 +22,8 @@ import java.util.List;
 public class HelloController implements SalesmanCalculatorCallback {
 
     boolean calculating = false;
+    String[] namePartsFirst = new String[]{"","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
+    String[] namePartsSecond = new String[]{"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
     SalesmanSolutionCalculator calculator;
     int generation = 0;
     CityNetworkSingleton singleton;
@@ -47,11 +49,18 @@ public class HelloController implements SalesmanCalculatorCallback {
     public javafx.scene.layout.HBox citiesHBox;
     @FXML
     public javafx.scene.layout.VBox citiesVBox;
+    @FXML
+    public GridPane topCityNameGrid;
+    @FXML
+    public GridPane sideCityNameGrid;
 
     @FXML
     public Button startCalculationsButton;
     @FXML
     public Button cityGenerateButton;
+
+    int previousTopColumnNumber = -1;
+    int previousSideRowNumber = -1;
 
 
     ArrayList<Label> labelReferences;
@@ -120,6 +129,7 @@ public class HelloController implements SalesmanCalculatorCallback {
     }
 
     private void setUpCitiesPage() {
+        setUpNameGrids(0, 0);
         Integer[][] travelCostGrid = singleton.getCityTravelCostGrid();
         citiesGrid.getChildren().clear();
         citiesGrid.resize(25 * singleton.getCityGridSize(), 30 * singleton.getCityGridSize());
@@ -142,6 +152,15 @@ public class HelloController implements SalesmanCalculatorCallback {
         symmetricPathCostCheckbox.setSelected(true);
         symmetricPathCostCheckbox.selectedProperty().addListener((observable, oldV, newV) -> {
             singleton.flipSymmetryConstraint();
+        });
+        citiesGridScrollPane.vvalueProperty().addListener((ov, old_val, new_val) -> {
+            setUpNameGrids((int)(citiesGridScrollPane.getVvalue() * 30 * singleton.getCityGridSize()),
+                    (int)(citiesGridScrollPane.getHvalue() * 25 * singleton.getCityGridSize()));
+                });
+        citiesGridScrollPane.hvalueProperty().addListener((
+                ov, old_val, new_val) -> {
+            setUpNameGrids((int)(citiesGridScrollPane.getVvalue() * 30 * singleton.getCityGridSize()),
+                    (int)(citiesGridScrollPane.getHvalue() * 25 * singleton.getCityGridSize()));
         });
     }
 
@@ -212,5 +231,25 @@ public class HelloController implements SalesmanCalculatorCallback {
             numberOfThreadsInput.setDisable(!newV);
         });
         multithreadedSolverCheckbox.setSelected(true);
+    }
+
+    private void setUpNameGrids(int vValue, int hValue) {
+        int topColumnNumber = vValue / 30;
+        int sideRowNumber = hValue / 25;
+        if(topColumnNumber != previousTopColumnNumber) {
+            previousTopColumnNumber = topColumnNumber;
+            topCityNameGrid.getChildren().clear();
+            for(int i=0;i<14; i++) {
+                topCityNameGrid.add(new Label(namePartsFirst[(topColumnNumber + i) / namePartsSecond.length] + namePartsSecond[(topColumnNumber + i) % namePartsSecond.length]),  i, 0);
+            }
+        }
+        if(sideRowNumber != previousSideRowNumber) {
+            previousSideRowNumber = sideRowNumber;
+            sideCityNameGrid.getChildren().clear();
+            for(int i=0;i<13; i++) {
+                sideCityNameGrid.add(new Label(namePartsFirst[(sideRowNumber + i) / namePartsSecond.length] + namePartsSecond[(sideRowNumber + i) % namePartsSecond.length]), 0, i);
+            }
+        }
+
     }
 }
