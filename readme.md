@@ -12,6 +12,7 @@ Changelog:
   * Cities now have names, from A to Z and from AA to ZZ. Upon dragging the grid containing travel cost of cities, the names of visible cities will change accordingly
   * Data regarding minimum and average travel costs are now transmitted onto the graph
   * Added internal clock, and graph refresh rate variables, to cut on the amount of data transmitted onto the graph
+  * Added forced clear after 30 graph elements appear
 
 * 20.12.2021
   * User can now set his own values for:

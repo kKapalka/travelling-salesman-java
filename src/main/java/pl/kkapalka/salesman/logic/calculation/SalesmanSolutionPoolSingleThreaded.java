@@ -34,7 +34,7 @@ public class SalesmanSolutionPoolSingleThreaded implements SalesmanSolutionCalcu
         for(int i= sortedList.size(); i < thread.salesmanSolutions.length / 2; i++) {
             sortedList.add(sortedList.get(0));
         }
-        callback.onCollectLastGeneration(sortedList.stream().sorted(SalesmanSolution::compareTo).collect(Collectors.toList()));
+        callback.onCollectLastGeneration(sortedList.stream().sorted(SalesmanSolution::compareTo).collect(Collectors.toList()), internalClock);
         try {
             thread.join();
         } catch (InterruptedException e) {

@@ -43,7 +43,7 @@ public class SalesmanSolutionPoolMultiThreaded implements SalesmanSolutionCallba
                 e.printStackTrace();
             }
         }
-        callback.onCollectLastGeneration(salesmanSolutionArrayList.stream().sorted(SalesmanSolution::compareTo).collect(Collectors.toList()));
+        callback.onCollectLastGeneration(salesmanSolutionArrayList.stream().sorted(SalesmanSolution::compareTo).collect(Collectors.toList()), internalClock);
     }
 
     @Override

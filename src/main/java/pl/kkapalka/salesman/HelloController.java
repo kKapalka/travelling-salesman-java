@@ -90,6 +90,7 @@ public class HelloController implements SalesmanCalculatorCallback {
 
         travelCostAxis.setUpperBound(singleton.getCityGridSize() * 470);
         travelCostAxis.setForceZeroInRange(false);
+        generationNumberAxis.setForceZeroInRange(false);
         travelCostAxis.setLowerBound(singleton.getCityGridSize() * 100);
     }
 
@@ -101,7 +102,7 @@ public class HelloController implements SalesmanCalculatorCallback {
             averageSpecimenSeries.getData().clear();
             progressChart.setScaleX(1.0);
             progressChart.setScaleY(1.0);
-            generation = 1;
+            generation = 1 - singleton.getChartRefreshRate();
             calculator = CalculationModeSelector.getCalculatorBasedOnCheckbox(multithreadedSolverCheckbox.isSelected()).createCalculator(this);
             calculator.startCalculation();
             startCalculationsButton.setText("Stop Calculations");
@@ -127,14 +128,20 @@ public class HelloController implements SalesmanCalculatorCallback {
     @Override
     public void onTransmitGraphData(Long minimumCost, Double averageCost) {
         javafx.application.Platform.runLater(() -> {
-            bestSpecimenSeries.getData().add(new javafx.scene.chart.XYChart.Data<>(generation, minimumCost));
-            averageSpecimenSeries.getData().add(new javafx.scene.chart.XYChart.Data<>(generation, averageCost));
             generation+=singleton.getChartRefreshRate();
+            if(bestSpecimenSeries.getData().size() > 30) {
+                bestSpecimenSeries.getData().clear();
+                averageSpecimenSeries.getData().clear();
+                generationNumberAxis.setLowerBound(generation);
+            }
+            averageSpecimenSeries.getData().add(new javafx.scene.chart.XYChart.Data<>(generation, averageCost));
+            bestSpecimenSeries.getData().add(new javafx.scene.chart.XYChart.Data<>(generation, minimumCost));
+
         });
     }
 
     @Override
-    public void onCollectLastGeneration(List<SalesmanSolution> solutions) {
+    public void onCollectLastGeneration(List<SalesmanSolution> solutions, int internalClock) {
         System.out.println("generation "+generation);
         System.out.println(solutions.size());
         System.out.println(solutions.stream().map(SalesmanSolution::getTotalTravelCost).collect(Collectors.toList()));
