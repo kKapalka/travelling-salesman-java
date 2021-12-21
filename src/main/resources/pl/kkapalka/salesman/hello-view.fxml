@@ -101,7 +101,7 @@
                      <children>
                         <LineChart fx:id="progressChart" layoutX="6.0" layoutY="19.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="339.0" prefWidth="546.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                           <xAxis>
-                            <CategoryAxis fx:id="generationNumberAxis" label="Generation" side="BOTTOM" />
+                            <NumberAxis fx:id="generationNumberAxis" label="Generation" side="BOTTOM" />
                           </xAxis>
                           <yAxis>
                             <NumberAxis fx:id="travelCostAxis" label="Travel cost" side="LEFT" />

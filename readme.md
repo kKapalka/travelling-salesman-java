@@ -10,6 +10,7 @@ Changelog:
   * User can enable/disable symmetry constraint, forcing the travel cost from city A to B to be the same as cost of travel from city B to A. This button will not generate new travel costs by itself.
   * User can use 'Generate cities' button to calculate new travel costs
   * Cities now have names, from A to Z and from AA to ZZ. Upon dragging the grid containing travel cost of cities, the names of visible cities will change accordingly
+  * Data regarding minimum and average travel costs are now transmitted onto the graph
 
 * 20.12.2021
   * User can now set his own values for:

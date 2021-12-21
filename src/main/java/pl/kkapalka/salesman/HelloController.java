@@ -29,6 +29,8 @@ public class HelloController implements SalesmanCalculatorCallback {
     CityNetworkSingleton singleton;
     List<SalesmanSolution> solutions;
     javafx.scene.layout.Border border;
+    javafx.scene.chart.XYChart.Series<Number, Number> bestSpecimenSeries = new javafx.scene.chart.XYChart.Series<>();
+    javafx.scene.chart.XYChart.Series<Number, Number> averageSpecimenSeries = new javafx.scene.chart.XYChart.Series<>();
 
     @FXML
     protected TextField cityCountInput;
@@ -54,6 +56,13 @@ public class HelloController implements SalesmanCalculatorCallback {
     public GridPane topCityNameGrid;
     @FXML
     public GridPane sideCityNameGrid;
+    @FXML
+    public javafx.scene.chart.LineChart<Number, Number> progressChart;
+    @FXML
+    public javafx.scene.chart.NumberAxis generationNumberAxis;
+    @FXML
+    public javafx.scene.chart.NumberAxis travelCostAxis;
+
 
     @FXML
     public Button startCalculationsButton;
@@ -77,12 +86,21 @@ public class HelloController implements SalesmanCalculatorCallback {
         singleton = CityNetworkSingleton.getInstance();
         setUpSettingsPage();
         setUpCitiesPage();
+        setUpProgressChartPage();
+
+        travelCostAxis.setUpperBound(singleton.getCityGridSize() * 470);
+        travelCostAxis.setForceZeroInRange(false);
+        travelCostAxis.setLowerBound(singleton.getCityGridSize() * 100);
     }
 
     @FXML
     protected void toggleCalculations() {
         calculating = !calculating;
         if(calculating) {
+            bestSpecimenSeries.getData().clear();
+            averageSpecimenSeries.getData().clear();
+            progressChart.setScaleX(1.0);
+            progressChart.setScaleY(1.0);
             generation = 0;
             calculator = CalculationModeSelector.getCalculatorBasedOnCheckbox(multithreadedSolverCheckbox.isSelected()).createCalculator(this);
             calculator.startCalculation();
@@ -108,9 +126,11 @@ public class HelloController implements SalesmanCalculatorCallback {
 
     @Override
     public void onTransmitGraphData(Long minimumCost, Double averageCost) {
-        System.out.println("minimum cost - "+minimumCost);
-        System.out.println("average cost - "+averageCost);
-        generation++;
+        javafx.application.Platform.runLater(() -> {
+            bestSpecimenSeries.getData().add(new javafx.scene.chart.XYChart.Data<>(generation, minimumCost));
+            averageSpecimenSeries.getData().add(new javafx.scene.chart.XYChart.Data<>(generation, averageCost));
+            generation++;
+        });
     }
 
     @Override
@@ -128,6 +148,10 @@ public class HelloController implements SalesmanCalculatorCallback {
         multithreadedSolverCheckbox.setDisable(calculating);
         cityGenerateButton.setDisable(calculating);
         symmetricPathCostCheckbox.setDisable(calculating);
+    }
+
+    private void setUpProgressChartPage() {
+        progressChart.getData().addAll(bestSpecimenSeries, averageSpecimenSeries);
     }
 
     private void setUpCitiesPage() {
@@ -215,6 +239,8 @@ public class HelloController implements SalesmanCalculatorCallback {
             singleton.setCityGridSize(value);
             joiningPointInputListener.maximumValue = value;
             redrawCities();
+            travelCostAxis.setUpperBound(value * 470);
+            travelCostAxis.setLowerBound(value * 100);
         }, change -> {
             joiningPointInputListener.check();
             cityCountInputValid = change;
