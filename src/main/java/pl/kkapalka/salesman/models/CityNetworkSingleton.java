@@ -9,6 +9,7 @@ public final class CityNetworkSingleton {
     private Integer JOINING_POINT = 50;
     private Integer TOTAL_SOLUTIONS_PER_GENERATION = 100;
     private Integer TOTAL_THREAD_AMOUNT = 5;
+    private Integer CHART_REFRESH_RATE = 1000;
     private final Random random = new Random();
 
     private Integer[][] cityTravelCostGrid;
@@ -155,5 +156,13 @@ public final class CityNetworkSingleton {
      */
     public Boolean getSymmetryConstaint() {
         return symmetryConstaint;
+    }
+
+    /**
+     * Getter for the chart refresh rate
+     * @return chart refresh rate
+     */
+    public Integer getChartRefreshRate() {
+        return CHART_REFRESH_RATE;
     }
 }

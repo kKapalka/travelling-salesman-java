@@ -17,6 +17,7 @@ public class SalesmanSolutionPoolMultiThreaded implements SalesmanSolutionCallba
     private ArrayList<SalesmanSolution> salesmanSolutionArrayList;
     AtomicInteger waitingThreads = new AtomicInteger(0);
     SalesmanCalculatorCallback callback;
+    int internalClock = 0;
 
     public SalesmanSolutionPoolMultiThreaded(SalesmanCalculatorCallback callback) {
         this.callback = callback;
@@ -28,6 +29,7 @@ public class SalesmanSolutionPoolMultiThreaded implements SalesmanSolutionCallba
     }
 
     public void startCalculation() {
+        internalClock = CityNetworkSingleton.getInstance().getChartRefreshRate();
         for (SalesmanThreadPooled salesmanThread : salesmanThreads) {
             salesmanThread.start();
         }
@@ -65,8 +67,12 @@ public class SalesmanSolutionPoolMultiThreaded implements SalesmanSolutionCallba
                 .filter(distinctByKey(SalesmanSolution::getTotalTravelCost))
                 .limit(halfPopulation)
                 .collect(Collectors.toCollection(ArrayList::new));
-        callback.onTransmitGraphData(salesmanSolutionArrayList.get(0).getTotalTravelCost(), salesmanSolutionArrayList.stream()
-                .mapToLong(SalesmanSolution::getTotalTravelCost).average().getAsDouble());
+        if(internalClock == CityNetworkSingleton.getInstance().getChartRefreshRate()) {
+            internalClock = -1;
+            callback.onTransmitGraphData(salesmanSolutionArrayList.get(0).getTotalTravelCost(), salesmanSolutionArrayList.stream()
+                    .mapToLong(SalesmanSolution::getTotalTravelCost).average().getAsDouble());
+        }
+        internalClock++;
         for(int i= salesmanSolutionArrayList.size(); i < halfPopulation; i++) {
             salesmanSolutionArrayList.add(salesmanSolutionArrayList.get(0));
         }

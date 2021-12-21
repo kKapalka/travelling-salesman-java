@@ -101,7 +101,7 @@ public class HelloController implements SalesmanCalculatorCallback {
             averageSpecimenSeries.getData().clear();
             progressChart.setScaleX(1.0);
             progressChart.setScaleY(1.0);
-            generation = 0;
+            generation = 1;
             calculator = CalculationModeSelector.getCalculatorBasedOnCheckbox(multithreadedSolverCheckbox.isSelected()).createCalculator(this);
             calculator.startCalculation();
             startCalculationsButton.setText("Stop Calculations");
@@ -129,7 +129,7 @@ public class HelloController implements SalesmanCalculatorCallback {
         javafx.application.Platform.runLater(() -> {
             bestSpecimenSeries.getData().add(new javafx.scene.chart.XYChart.Data<>(generation, minimumCost));
             averageSpecimenSeries.getData().add(new javafx.scene.chart.XYChart.Data<>(generation, averageCost));
-            generation++;
+            generation+=singleton.getChartRefreshRate();
         });
     }
 

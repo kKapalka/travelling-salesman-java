@@ -13,6 +13,7 @@ import static pl.kkapalka.salesman.HelperMethods.distinctByKey;
 public class SalesmanSolutionPoolSingleThreaded implements SalesmanSolutionCalculator, SalesmanSolutionCallback {
     private final SalesmanThreadUnpooled thread;
     SalesmanCalculatorCallback callback;
+    int internalClock = 0;
 
     public SalesmanSolutionPoolSingleThreaded(SalesmanCalculatorCallback callback) {
         this.callback = callback;
@@ -20,6 +21,7 @@ public class SalesmanSolutionPoolSingleThreaded implements SalesmanSolutionCalcu
     }
 
     public void startCalculation() {
+        internalClock = CityNetworkSingleton.getInstance().getChartRefreshRate();
         thread.start();
     }
 
@@ -46,7 +48,11 @@ public class SalesmanSolutionPoolSingleThreaded implements SalesmanSolutionCalcu
 
     @Override
     public synchronized void transferSolutions(SalesmanSolution bestSolution) {
-        callback.onTransmitGraphData(bestSolution.getTotalTravelCost(), Arrays.stream(thread.salesmanSolutions)
-                .mapToLong(SalesmanSolution::getTotalTravelCost).average().getAsDouble());
+        if(internalClock == CityNetworkSingleton.getInstance().getChartRefreshRate()) {
+            internalClock = -1;
+            callback.onTransmitGraphData(bestSolution.getTotalTravelCost(), Arrays.stream(thread.salesmanSolutions)
+                    .mapToLong(SalesmanSolution::getTotalTravelCost).average().getAsDouble());
+        }
+        internalClock++;
     }
 }
