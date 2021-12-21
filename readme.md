@@ -4,6 +4,9 @@ Implementation of a solver of the Travelling Salesman problem, using genetic alg
 
 Changelog:
 
+* 21.12.2021
+  * Initial data on city travel costs are automatically loaded onto 'Cities' page
+
 * 20.12.2021
   * User can now set his own values for:
     * Number of threads used for multithreaded solver (between 2 and 10)
