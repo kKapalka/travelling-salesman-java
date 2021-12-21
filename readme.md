@@ -6,6 +6,9 @@ Changelog:
 
 * 21.12.2021
   * Initial data on city travel costs are automatically loaded onto 'Cities' page
+  * Upon resizing of the city grid, the data on 'Cities' page gets updated
+  * User can enable/disable symmetry constraint, forcing the travel cost from city A to B to be the same as cost of travel from city B to A. This button will not generate new travel costs by itself.
+  * User can use 'Generate cities' button to calculate new travel costs
 
 * 20.12.2021
   * User can now set his own values for:

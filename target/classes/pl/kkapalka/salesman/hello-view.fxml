@@ -33,25 +33,25 @@
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
                         <CheckBox fx:id="symmetricPathCostCheckbox" layoutX="471.0" layoutY="32.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="85.0" text="Symmetric Path Cost" wrapText="true" />
-                        <Button fx:id="cityGenerateButton" layoutX="471.0" layoutY="80.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="77.0" text="Generate" />
-                        <GridPane layoutX="24.0" layoutY="2.0" prefHeight="23.0" prefWidth="441.0">
+                        <Button fx:id="cityGenerateButton" layoutX="471.0" layoutY="80.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="77.0" text="Generate" onMouseClicked="#generateNewCityGrid" />
+                        <GridPane layoutX="32.0" layoutY="2.0" prefHeight="20.0" prefWidth="420.0" AnchorPane.topAnchor="5.0">
                           <rowConstraints>
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                           </rowConstraints>
                         </GridPane>
-                         <GridPane layoutX="-2.0" layoutY="24.0" prefHeight="343.0" prefWidth="28.0">
+                         <GridPane layoutX="3.0" layoutY="24.0" prefHeight="325.0" prefWidth="30.0" AnchorPane.leftAnchor="1.0">
                              <columnConstraints>
                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="30.0" />
                              </columnConstraints>
                          </GridPane>
-                        <HBox layoutX="31.0" layoutY="25.0" prefHeight="341.0" prefWidth="425.0">
+                        <HBox fx:id="citiesHBox" layoutX="31.0" layoutY="25.0" prefHeight="335.0" prefWidth="430.0">
                            <children>
-                              <VBox prefHeight="341.0" prefWidth="438.0">
+                              <VBox fx:id="citiesVBox" prefHeight="335.0" prefWidth="430.0">
                                  <opaqueInsets>
                                     <Insets />
                                  </opaqueInsets>
                                  <children>
-                                    <ScrollPane fx:id="citiesGridScrollPane" prefHeight="338.0" prefWidth="431.0">
+                                    <ScrollPane fx:id="citiesGridScrollPane" prefHeight="335.0" prefWidth="430.0">
                                       <content>
                                           <GridPane fx:id="citiesGrid" gridLinesVisible="true" maxHeight="-Infinity" maxWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                           </GridPane>
