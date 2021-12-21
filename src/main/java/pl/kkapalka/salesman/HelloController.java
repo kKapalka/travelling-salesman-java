@@ -28,6 +28,7 @@ public class HelloController implements SalesmanCalculatorCallback {
     int generation = 0;
     CityNetworkSingleton singleton;
     List<SalesmanSolution> solutions;
+    javafx.scene.layout.Border border;
 
     @FXML
     protected TextField cityCountInput;
@@ -71,6 +72,7 @@ public class HelloController implements SalesmanCalculatorCallback {
 
     @FXML
     public void initialize() {
+        border = new javafx.scene.layout.Border(new javafx.scene.layout.BorderStroke(javafx.scene.paint.Color.BLACK, javafx.scene.layout.BorderStrokeStyle.SOLID, javafx.scene.layout.CornerRadii.EMPTY, javafx.scene.layout.BorderWidths.DEFAULT ));
         labelReferences = new ArrayList<>();
         singleton = CityNetworkSingleton.getInstance();
         setUpSettingsPage();
@@ -132,8 +134,8 @@ public class HelloController implements SalesmanCalculatorCallback {
         setUpNameGrids(0, 0);
         Integer[][] travelCostGrid = singleton.getCityTravelCostGrid();
         citiesGrid.getChildren().clear();
-        citiesGrid.resize(25 * singleton.getCityGridSize(), 30 * singleton.getCityGridSize());
-        citiesGridScrollPane.resize(25 * singleton.getCityGridSize(), 30 * singleton.getCityGridSize());
+        citiesGrid.resize( 30 * singleton.getCityGridSize(), 25 * singleton.getCityGridSize());
+        citiesGridScrollPane.resize( 30 * singleton.getCityGridSize(), 25 * singleton.getCityGridSize());
 
         for(int i=0;i<singleton.getCityGridSize(); i++) {
             RowConstraints row = new RowConstraints(25);
@@ -144,6 +146,9 @@ public class HelloController implements SalesmanCalculatorCallback {
         for(int i=0;i<singleton.getCityGridSize(); i++) {
             for (int j=0;j<singleton.getCityGridSize(); j++) {
                 Label label = new Label(travelCostGrid[i][j].toString());
+                label.setPrefWidth(28);
+                label.setPrefHeight(23);
+                label.setBorder(border);
                 labelReferences.add(label);
                 citiesGrid.add(label, i, j);
             }
@@ -154,19 +159,19 @@ public class HelloController implements SalesmanCalculatorCallback {
             singleton.flipSymmetryConstraint();
         });
         citiesGridScrollPane.vvalueProperty().addListener((ov, old_val, new_val) -> {
-            setUpNameGrids((int)(citiesGridScrollPane.getVvalue() * 30 * singleton.getCityGridSize()),
-                    (int)(citiesGridScrollPane.getHvalue() * 25 * singleton.getCityGridSize()));
+            setUpNameGrids(citiesGridScrollPane.getVvalue() + 0.005,
+                    citiesGridScrollPane.getHvalue() + 0.005);
                 });
         citiesGridScrollPane.hvalueProperty().addListener((
                 ov, old_val, new_val) -> {
-            setUpNameGrids((int)(citiesGridScrollPane.getVvalue() * 30 * singleton.getCityGridSize()),
-                    (int)(citiesGridScrollPane.getHvalue() * 25 * singleton.getCityGridSize()));
+            setUpNameGrids(citiesGridScrollPane.getVvalue() + 0.005,
+                    citiesGridScrollPane.getHvalue() + 0.005);
         });
     }
 
     private void redrawCities() {
-        citiesGrid.resize(25 * singleton.getCityGridSize(), 30 * singleton.getCityGridSize());
-        citiesGridScrollPane.resize(25 * singleton.getCityGridSize(), 30 * singleton.getCityGridSize());
+        citiesGrid.resize(30 * singleton.getCityGridSize(), 25 * singleton.getCityGridSize());
+        citiesGridScrollPane.resize(30 * singleton.getCityGridSize(), 25 * singleton.getCityGridSize());
         Integer[][] travelCostGrid = singleton.getCityTravelCostGrid();
         citiesGridScrollPane.setHvalue(0);
         citiesGridScrollPane.setVvalue(0);
@@ -187,6 +192,9 @@ public class HelloController implements SalesmanCalculatorCallback {
         for(int i=0;i<singleton.getCityGridSize(); i++) {
             for (int j=0;j<singleton.getCityGridSize(); j++) {
                 Label label = new Label(travelCostGrid[i][j].toString());
+                label.setPrefWidth(28);
+                label.setPrefHeight(23);
+                label.setBorder(border);
                 labelReferences.add(label);
                 citiesGrid.add(label, i, j);
             }
@@ -233,21 +241,21 @@ public class HelloController implements SalesmanCalculatorCallback {
         multithreadedSolverCheckbox.setSelected(true);
     }
 
-    private void setUpNameGrids(int vValue, int hValue) {
-        int topColumnNumber = vValue / 30;
-        int sideRowNumber = hValue / 25;
-        if(topColumnNumber != previousTopColumnNumber) {
-            previousTopColumnNumber = topColumnNumber;
-            topCityNameGrid.getChildren().clear();
-            for(int i=0;i<14; i++) {
-                topCityNameGrid.add(new Label(namePartsFirst[(topColumnNumber + i) / namePartsSecond.length] + namePartsSecond[(topColumnNumber + i) % namePartsSecond.length]),  i, 0);
-            }
-        }
+    private void setUpNameGrids(double vValue, double hValue) {
+        int sideRowNumber = (int) (vValue * (singleton.getCityGridSize() - 13));
         if(sideRowNumber != previousSideRowNumber) {
             previousSideRowNumber = sideRowNumber;
             sideCityNameGrid.getChildren().clear();
             for(int i=0;i<13; i++) {
                 sideCityNameGrid.add(new Label(namePartsFirst[(sideRowNumber + i) / namePartsSecond.length] + namePartsSecond[(sideRowNumber + i) % namePartsSecond.length]), 0, i);
+            }
+        }
+        int topColumnNumber = (int) (hValue * (singleton.getCityGridSize() - 14));
+        if(topColumnNumber != previousTopColumnNumber) {
+            previousTopColumnNumber = topColumnNumber;
+            topCityNameGrid.getChildren().clear();
+            for(int i=0;i<14; i++) {
+                topCityNameGrid.add(new Label(namePartsFirst[(topColumnNumber + i) / namePartsSecond.length] + namePartsSecond[(topColumnNumber + i) % namePartsSecond.length]),  i, 0);
             }
         }
 
