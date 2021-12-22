@@ -161,7 +161,7 @@ public class HelloController implements SalesmanCalculatorCallback {
     }
 
     private void toggleAllInputs() {
-        numberOfThreadsInput.setDisable(calculating);
+        numberOfThreadsInput.setDisable(calculating || !(multithreadedSolverCheckbox.isSelected()));
         cityCountInput.setDisable(calculating);
         specimenCountInput.setDisable(calculating);
         joiningPointInput.setDisable(calculating);

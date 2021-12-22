@@ -4,6 +4,10 @@ Implementation of a solver of the Travelling Salesman problem, using genetic alg
 
 Changelog:
 
+* 22.12.2021
+  * Fixed a minor bug where the number of threads could be set if user was using single-threaded solver
+  * Produced an .exe file, and included it with the repository
+
 * 21.12.2021
   * Initial data on city travel costs are automatically loaded onto 'Cities' page
   * Upon resizing of the city grid, the data on 'Cities' page gets updated
