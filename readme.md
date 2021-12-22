@@ -7,6 +7,7 @@ Changelog:
 * 22.12.2021
   * Fixed a minor bug where the number of threads could be set if user was using single-threaded solver
   * Produced an .exe file, and included it with the repository
+  * Modified the way travel costs are displayed - instead of pure integers, they now have a single decimal point
 
 * 21.12.2021
   * Initial data on city travel costs are automatically loaded onto 'Cities' page

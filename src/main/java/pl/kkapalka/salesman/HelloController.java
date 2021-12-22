@@ -108,9 +108,9 @@ public class HelloController implements SalesmanCalculatorCallback {
             resultDetailsLabel.setText("");
             bestSpecimenSeries.getData().clear();
             averageSpecimenSeries.getData().clear();
-            progressChart.setScaleX(1.0);
-            progressChart.setScaleY(1.0);
             mainTabPane.getSelectionModel().select(2);
+            generationNumberAxis.setLowerBound(0);
+            generationNumberAxis.setUpperBound(30000);
             mainTabPane.setDisable(true);
             generation = 1 - singleton.getChartRefreshRate();
             calculator = CalculationModeSelector.getCalculatorBasedOnCheckbox(multithreadedSolverCheckbox.isSelected()).createCalculator(this);
@@ -144,17 +144,17 @@ public class HelloController implements SalesmanCalculatorCallback {
                 bestSpecimenSeries.getData().clear();
                 averageSpecimenSeries.getData().clear();
                 generationNumberAxis.setLowerBound(generation);
+                generationNumberAxis.setUpperBound(generation + 30000);
             }
-            averageSpecimenSeries.getData().add(new javafx.scene.chart.XYChart.Data<>(generation, averageCost));
-            bestSpecimenSeries.getData().add(new javafx.scene.chart.XYChart.Data<>(generation, minimumCost));
-
+            averageSpecimenSeries.getData().add(new javafx.scene.chart.XYChart.Data<>(generation, averageCost / 10));
+            bestSpecimenSeries.getData().add(new javafx.scene.chart.XYChart.Data<>(generation, minimumCost / 10));
         });
     }
 
     @Override
     public void onCollectLastGeneration(List<SalesmanSolution> solutions, int internalClock) {
-        averageSpecimenSeries.getData().add(new javafx.scene.chart.XYChart.Data<>(generation + internalClock, solutions.stream().mapToLong(SalesmanSolution::getTotalTravelCost).average().getAsDouble()));
-        bestSpecimenSeries.getData().add(new javafx.scene.chart.XYChart.Data<>(generation + internalClock, solutions.stream().min(SalesmanSolution::compareTo).get().getTotalTravelCost()));
+        averageSpecimenSeries.getData().add(new javafx.scene.chart.XYChart.Data<>(generation + internalClock, solutions.stream().mapToLong(SalesmanSolution::getTotalTravelCost).average().getAsDouble() / 10));
+        bestSpecimenSeries.getData().add(new javafx.scene.chart.XYChart.Data<>(generation + internalClock, solutions.stream().min(SalesmanSolution::compareTo).get().getTotalTravelCost() / 10));
         this.solutions = solutions;
         generation += internalClock;
         modifyResultsPage();
@@ -171,10 +171,12 @@ public class HelloController implements SalesmanCalculatorCallback {
     }
 
     private void setUpProgressChartPage() {
-        travelCostAxis.setUpperBound(singleton.getCityGridSize() * 470);
+        generationNumberAxis.setTickUnit(1000);
+        generationNumberAxis.setLowerBound(0);
+        generationNumberAxis.setUpperBound(30000);
         travelCostAxis.setForceZeroInRange(false);
         generationNumberAxis.setForceZeroInRange(false);
-        travelCostAxis.setLowerBound(singleton.getCityGridSize() * 100);
+        travelCostAxis.setLowerBound(singleton.getCityGridSize() * 10);
         bestSpecimenSeries.setName("Best specimen in generation");
         averageSpecimenSeries.setName("Average specimen in generation");
         progressChart.getData().addAll(bestSpecimenSeries, averageSpecimenSeries);
@@ -205,7 +207,7 @@ public class HelloController implements SalesmanCalculatorCallback {
         resultDetailsGridView.resize(resultDetailsGridView.getWidth(), resultDetailsGridAmount * 25);
 
         for(int i=0; i < solutions.size(); i++) {
-            Label label = new Label("Travel cost of specimen " + (i + 1) + ": " + solutions.get(i).getTotalTravelCost());
+            Label label = new Label("Travel cost of specimen " + (i + 1) + ": " + HelperMethods.convertCostToString(Long.valueOf(solutions.get(i).getTotalTravelCost()).intValue()));
             label.setPrefHeight(25);
             label.setPrefWidth(resultsGrid.getWidth());
 
@@ -221,11 +223,11 @@ public class HelloController implements SalesmanCalculatorCallback {
                     resultDetailsGridView.add(firstDetailLabel, 0, 0);
                     int j = 1;
                     for (; j < travelCosts.length; j++) {
-                        Label detailLabel = new Label(namePartsFirst[travelRoute[j] / namePartsSecond.length] + namePartsSecond[travelRoute[j] % namePartsSecond.length] + "(" + travelCosts[travelRoute[j - 1]][travelRoute[j]] + ") ->");
+                        Label detailLabel = new Label(namePartsFirst[travelRoute[j] / namePartsSecond.length] + namePartsSecond[travelRoute[j] % namePartsSecond.length] + "(" + HelperMethods.convertCostToString(travelCosts[travelRoute[j - 1]][travelRoute[j]]) + ") ->");
                         detailLabel.setPrefHeight(25);
                         resultDetailsGridView.add(detailLabel, j % 3, j / 3);
                     }
-                    Label returnDetailLabel = new Label(namePartsFirst[travelRoute[0] / namePartsSecond.length] + namePartsSecond[travelRoute[0] % namePartsSecond.length] + "(" + travelCosts[travelRoute[j-1]][travelRoute[0]] + ")");
+                    Label returnDetailLabel = new Label(namePartsFirst[travelRoute[0] / namePartsSecond.length] + namePartsSecond[travelRoute[0] % namePartsSecond.length] + "(" + HelperMethods.convertCostToString(travelCosts[travelRoute[j-1]][travelRoute[0]]) + ")");
                     returnDetailLabel.setPrefHeight(25);
                     resultDetailsGridView.add(returnDetailLabel, j % 3, j / 3);
                 }
@@ -249,7 +251,7 @@ public class HelloController implements SalesmanCalculatorCallback {
         }
         for(int i=0;i<singleton.getCityGridSize(); i++) {
             for (int j=0;j<singleton.getCityGridSize(); j++) {
-                Label label = new Label(travelCostGrid[i][j].toString());
+                Label label = new Label(HelperMethods.convertCostToString(travelCostGrid[i][j]));
                 label.setPrefWidth(28);
                 label.setPrefHeight(23);
                 label.setBorder(border);
@@ -295,7 +297,7 @@ public class HelloController implements SalesmanCalculatorCallback {
         }
         for(int i=0;i<singleton.getCityGridSize(); i++) {
             for (int j=0;j<singleton.getCityGridSize(); j++) {
-                Label label = new Label(travelCostGrid[i][j].toString());
+                Label label = new Label(HelperMethods.convertCostToString(travelCostGrid[i][j]));
                 label.setPrefWidth(28);
                 label.setPrefHeight(23);
                 label.setBorder(border);
@@ -319,8 +321,8 @@ public class HelloController implements SalesmanCalculatorCallback {
             singleton.setCityGridSize(value);
             joiningPointInputListener.maximumValue = value;
             redrawCities();
-            travelCostAxis.setUpperBound(value * 470);
-            travelCostAxis.setLowerBound(value * 100);
+            travelCostAxis.setUpperBound(value * 47);
+            travelCostAxis.setLowerBound(value * 10);
         }, change -> {
             joiningPointInputListener.check();
             cityCountInputValid = change;
