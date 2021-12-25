@@ -1,5 +1,4 @@
 package pl.kkapalka.salesman.logic.calculation;
-
 import pl.kkapalka.salesman.models.SalesmanSolution;
 import java.util.concurrent.atomic.AtomicBoolean;
 import pl.kkapalka.salesman.models.CityNetworkSingleton;
@@ -41,7 +40,7 @@ public class SalesmanThreadPooled extends Thread {
 
     private void onCalculationFinished() {
         this.waiting.set(true);
-        callback.transferSolutions();
+        callback.transferSolutions(solutionArray[0]);
     }
 
     public void onResume() {
@@ -61,7 +60,7 @@ public class SalesmanThreadPooled extends Thread {
             solutionArray[i + halfLength - 1] = solutionArray[i-1].produceOffspring(solutionArray[i], CityNetworkSingleton.getInstance().getJoiningPoint());
         }
         if(solutionArray.length % 2 != 0) {
-            solutionArray[solutionArray.length - 1] = solutionArray[1].produceOffspring(solutionArray[solutionArray.length - 2], CityNetworkSingleton.getInstance().getJoiningPoint());
+            solutionArray[solutionArray.length - 1] = solutionArray[0].produceOffspring(solutionArray[solutionArray.length - 2], CityNetworkSingleton.getInstance().getJoiningPoint());
         }
         for(int i=0;i<solutionArray.length; i+=10) {
             solutionArray[random.nextInt(solutionArray.length)].mutate();

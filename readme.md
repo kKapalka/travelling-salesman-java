@@ -9,6 +9,7 @@ Changelog:
   * Extracted all 'Settings' page logic into SettingsControllerDelegate
   * Moved the city name creation logic inside HelperMethods
   * Removed every 'hello' from the application
+  * Written comments about SalesmanSolutionPoolMultiThreaded and simplified the SalesmanSolutionCallback interface
 
 * 22.12.2021
   * Fixed a minor bug where the number of threads could be set if user was using single-threaded solver

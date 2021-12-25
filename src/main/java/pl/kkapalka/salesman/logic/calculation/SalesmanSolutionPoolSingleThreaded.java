@@ -5,9 +5,7 @@ import pl.kkapalka.salesman.models.SalesmanSolution;
 import pl.kkapalka.salesman.models.CityNetworkSingleton;
 import java.util.Arrays;
 import java.util.stream.Collectors;
-
 import java.util.ArrayList;
-
 import static pl.kkapalka.salesman.HelperMethods.distinctByKey;
 
 public class SalesmanSolutionPoolSingleThreaded implements SalesmanSolutionCalculator, SalesmanSolutionCallback {
@@ -40,10 +38,6 @@ public class SalesmanSolutionPoolSingleThreaded implements SalesmanSolutionCalcu
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public void transferSolutions() {
     }
 
     @Override

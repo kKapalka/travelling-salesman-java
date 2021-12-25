@@ -9,9 +9,13 @@ import pl.kkapalka.salesman.logic.calcMode.SalesmanCalculatorCallback;
 import pl.kkapalka.salesman.models.SalesmanSolution;
 import pl.kkapalka.salesman.models.CityNetworkSingleton;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import static pl.kkapalka.salesman.HelperMethods.distinctByKey;
 
+/**
+ * Travelling salesman solver utilising multithreading.
+ * It splits up the specimens among available threads, and
+ * gathers them and performs the sorting once threads stop calculating
+ */
 public class SalesmanSolutionPoolMultiThreaded implements SalesmanSolutionCallback, SalesmanSolutionCalculator {
     private final SalesmanThreadPooled[] salesmanThreads;
     private ArrayList<SalesmanSolution> salesmanSolutionArrayList;
@@ -28,12 +32,23 @@ public class SalesmanSolutionPoolMultiThreaded implements SalesmanSolutionCallba
         salesmanSolutionArrayList = new ArrayList<>();
     }
 
+    /**
+     * Method for starting the calculations of travelling salesman solution.
+     * It starts all the calculating threads and lets them do their thing, until the user decides to stop calculating
+     */
     public void startCalculation() {
         internalClock = CityNetworkSingleton.getInstance().getChartRefreshRate();
         for (SalesmanThreadPooled salesmanThread : salesmanThreads) {
             salesmanThread.start();
         }
     }
+
+    /**
+     * Method for stopping the calculations of travelling salesman solution.
+     * It stops all the calculating threads, and then joins them into this thread.
+     * Once this is done, it communicates with the main thread and transfers
+     * to it all the data pertaining to last generation of solutions.
+     */
     public void stopCalculation() {
         for (SalesmanThreadPooled salesmanThread : salesmanThreads) {
             salesmanThread.cease();
@@ -46,18 +61,26 @@ public class SalesmanSolutionPoolMultiThreaded implements SalesmanSolutionCallba
         callback.onCollectLastGeneration(salesmanSolutionArrayList.stream().sorted(SalesmanSolution::compareTo).collect(Collectors.toList()), internalClock);
     }
 
+    /**
+     * Method called whenever the thread finishes calculations on its set of solutions.
+     * It signals the solver thread, and, once all the calculating threads are waiting,
+     * sorting and redistribution happens.
+     */
     @Override
-    public synchronized void transferSolutions() {
+    public void transferSolutions(SalesmanSolution bestSolution) {
         this.waitingThreads.incrementAndGet();
         if(this.waitingThreads.get() == salesmanThreads.length) {
             produceGeneration();
         }
     }
 
-    @Override
-    public void transferSolutions(SalesmanSolution bestSolution) {
-    }
-
+    /**
+     * Method responsible for sorting the travelling salesman solutions,
+     * based on the total travel cost, and redistributing them among the threds.
+     * First, it reaches into the threads and pulls the solution arrays.
+     * Then transmits the generation data (best and average solution).
+     * Then redistributes the solutions and resumes the algorithm
+     */
     public void produceGeneration() {
         this.waitingThreads.set(0);
         int halfPopulation = CityNetworkSingleton.getInstance().getTotalSolutionsPerGeneration() / 2;
