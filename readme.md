@@ -4,6 +4,12 @@ Implementation of a solver of the Travelling Salesman problem, using genetic alg
 
 Changelog:
 
+* 25.12.2021
+  * Created delegate classes, which will contain all logic pertaining to specific pages of the application
+  * Extracted all 'Settings' page logic into SettingsControllerDelegate
+  * Moved the city name creation logic inside HelperMethods
+  * Removed every 'hello' from the application
+
 * 22.12.2021
   * Fixed a minor bug where the number of threads could be set if user was using single-threaded solver
   * Produced an .exe file, and included it with the repository

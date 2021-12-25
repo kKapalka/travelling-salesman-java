@@ -10,7 +10,7 @@ public class NumericChangeListener implements ChangeListener<String> {
     NumericChangeCallback numericChangeCallback;
     ValueChangeCallback valueChangeCallback;
     int minimumValue;
-    int maximumValue;
+    public int maximumValue;
     int currentValue = 0;
 
     public NumericChangeListener(TextField textField, int minimumValue, int maximumValue,

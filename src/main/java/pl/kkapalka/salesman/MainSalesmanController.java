@@ -1,10 +1,12 @@
 package pl.kkapalka.salesman;
 
-import javafx.fxml.FXML;
 import pl.kkapalka.salesman.logic.calcMode.SalesmanSolutionCalculator;
 import pl.kkapalka.salesman.logic.calcMode.CalculationModeSelector;
 import pl.kkapalka.salesman.logic.calcMode.SalesmanCalculatorCallback;
+import pl.kkapalka.salesman.delegates.SettingsControllerDelegate;
 import pl.kkapalka.salesman.models.SalesmanSolution;
+import pl.kkapalka.salesman.models.CityNetworkSingleton;
+import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Button;
@@ -13,23 +15,26 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import java.util.ArrayList;
+import javafx.scene.chart.XYChart;
+import javafx.scene.layout.Border;
+import javafx.scene.chart.LineChart;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.control.TabPane;
 
-import pl.kkapalka.salesman.models.CityNetworkSingleton;
 import java.util.List;
 
-public class HelloController implements SalesmanCalculatorCallback {
+public class MainSalesmanController implements SalesmanCalculatorCallback, SalesmanControllerCallback {
 
     boolean calculating = false;
-    String[] namePartsFirst = new String[]{"","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
-    String[] namePartsSecond = new String[]{"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
     SalesmanSolutionCalculator calculator;
     int generation = 0;
     CityNetworkSingleton singleton;
     List<SalesmanSolution> solutions;
-    javafx.scene.layout.Border border;
-    javafx.scene.chart.XYChart.Series<Number, Number> bestSpecimenSeries = new javafx.scene.chart.XYChart.Series<>();
-    javafx.scene.chart.XYChart.Series<Number, Number> averageSpecimenSeries = new javafx.scene.chart.XYChart.Series<>();
+    Border border;
+    XYChart.Series<Number, Number> bestSpecimenSeries = new XYChart.Series<>();
+    XYChart.Series<Number, Number> averageSpecimenSeries = new XYChart.Series<>();
 
     @FXML
     protected TextField cityCountInput;
@@ -48,9 +53,9 @@ public class HelloController implements SalesmanCalculatorCallback {
     @FXML
     public ScrollPane citiesGridScrollPane;
     @FXML
-    public javafx.scene.layout.HBox citiesHBox;
+    public HBox citiesHBox;
     @FXML
-    public javafx.scene.layout.VBox citiesVBox;
+    public VBox citiesVBox;
     @FXML
     public GridPane topCityNameGrid;
     @FXML
@@ -64,15 +69,13 @@ public class HelloController implements SalesmanCalculatorCallback {
     @FXML
     public Label resultDetailsLabel;
     @FXML
-    public javafx.scene.chart.LineChart<Number, Number> progressChart;
+    public LineChart<Number, Number> progressChart;
     @FXML
-    public javafx.scene.chart.NumberAxis generationNumberAxis;
+    public NumberAxis generationNumberAxis;
     @FXML
-    public javafx.scene.chart.NumberAxis travelCostAxis;
+    public NumberAxis travelCostAxis;
     @FXML
-    public javafx.scene.control.TabPane mainTabPane;
-
-
+    public TabPane mainTabPane;
     @FXML
     public Button startCalculationsButton;
     @FXML
@@ -81,19 +84,16 @@ public class HelloController implements SalesmanCalculatorCallback {
     int previousTopColumnNumber = -1;
     int previousSideRowNumber = -1;
 
-
-    ArrayList<Label> labelReferences;
-    boolean cityCountInputValid = true;
-    boolean threadNumberInputValid = true;
-    boolean specimenCountInputValid = true;
-    boolean joiningPointInputValid = true;
+    SettingsControllerDelegate settingsControllerDelegate;
 
     @FXML
     public void initialize() {
-        border = new javafx.scene.layout.Border(new javafx.scene.layout.BorderStroke(javafx.scene.paint.Color.BLACK, javafx.scene.layout.BorderStrokeStyle.SOLID, javafx.scene.layout.CornerRadii.EMPTY, javafx.scene.layout.BorderWidths.DEFAULT ));
-        labelReferences = new ArrayList<>();
+        border = new Border(new javafx.scene.layout.BorderStroke(javafx.scene.paint.Color.BLACK, javafx.scene.layout.BorderStrokeStyle.SOLID, javafx.scene.layout.CornerRadii.EMPTY, javafx.scene.layout.BorderWidths.DEFAULT ));
         singleton = CityNetworkSingleton.getInstance();
-        setUpSettingsPage();
+
+        settingsControllerDelegate = new SettingsControllerDelegate(cityCountInput, numberOfThreadsInput, specimenCountInput,
+                joiningPointInput, multithreadedSolverCheckbox, startCalculationsButton, this);
+
         setUpCitiesPage();
         setUpProgressChartPage();
     }
@@ -111,14 +111,12 @@ public class HelloController implements SalesmanCalculatorCallback {
             mainTabPane.getSelectionModel().select(2);
             generationNumberAxis.setLowerBound(0);
             generationNumberAxis.setUpperBound(30000);
-            mainTabPane.setDisable(true);
             generation = 1 - singleton.getChartRefreshRate();
             calculator = CalculationModeSelector.getCalculatorBasedOnCheckbox(multithreadedSolverCheckbox.isSelected()).createCalculator(this);
             calculator.startCalculation();
             startCalculationsButton.setText("Stop Calculations");
         } else {
             calculator.stopCalculation();
-            mainTabPane.setDisable(false);
             startCalculationsButton.setText("Start Calculations");
         }
         toggleAllInputs();
@@ -128,12 +126,6 @@ public class HelloController implements SalesmanCalculatorCallback {
     protected void generateNewCityGrid() {
         singleton.generateNewGrid();
         redrawCities();
-    }
-
-    private void validateStartButton() {
-        startCalculationsButton.setDisable(!(joiningPointInputValid
-                && specimenCountInputValid && cityCountInputValid
-                && (threadNumberInputValid || !multithreadedSolverCheckbox.isSelected())));
     }
 
     @Override
@@ -161,22 +153,16 @@ public class HelloController implements SalesmanCalculatorCallback {
     }
 
     private void toggleAllInputs() {
-        numberOfThreadsInput.setDisable(calculating || !(multithreadedSolverCheckbox.isSelected()));
-        cityCountInput.setDisable(calculating);
-        specimenCountInput.setDisable(calculating);
-        joiningPointInput.setDisable(calculating);
-        multithreadedSolverCheckbox.setDisable(calculating);
+        settingsControllerDelegate.setDisabledInputs(calculating);
         cityGenerateButton.setDisable(calculating);
         symmetricPathCostCheckbox.setDisable(calculating);
+        mainTabPane.setDisable(calculating);
     }
 
     private void setUpProgressChartPage() {
         generationNumberAxis.setTickUnit(1000);
-        generationNumberAxis.setLowerBound(0);
-        generationNumberAxis.setUpperBound(30000);
         travelCostAxis.setForceZeroInRange(false);
         generationNumberAxis.setForceZeroInRange(false);
-        travelCostAxis.setLowerBound(singleton.getCityGridSize() * 10);
         bestSpecimenSeries.setName("Best specimen in generation");
         averageSpecimenSeries.setName("Average specimen in generation");
         progressChart.getData().addAll(bestSpecimenSeries, averageSpecimenSeries);
@@ -218,16 +204,16 @@ public class HelloController implements SalesmanCalculatorCallback {
                     int[] travelRoute = solutions.get(index).getTravelRoute();
                     Integer[][] travelCosts = singleton.getCityTravelCostGrid();
                     resultDetailsGridView.getChildren().clear();
-                    Label firstDetailLabel = new Label(namePartsFirst[travelRoute[0] / namePartsSecond.length] + namePartsSecond[travelRoute[0] % namePartsSecond.length] + "->");
+                    Label firstDetailLabel = new Label(HelperMethods.createCityName(travelRoute[0]) + "->");
                     firstDetailLabel.setPrefHeight(25);
                     resultDetailsGridView.add(firstDetailLabel, 0, 0);
                     int j = 1;
                     for (; j < travelCosts.length; j++) {
-                        Label detailLabel = new Label(namePartsFirst[travelRoute[j] / namePartsSecond.length] + namePartsSecond[travelRoute[j] % namePartsSecond.length] + "(" + HelperMethods.convertCostToString(travelCosts[travelRoute[j - 1]][travelRoute[j]]) + ") ->");
+                        Label detailLabel = new Label(HelperMethods.createCityName(travelRoute[j]) + "(" + HelperMethods.convertCostToString(travelCosts[travelRoute[j - 1]][travelRoute[j]]) + ") ->");
                         detailLabel.setPrefHeight(25);
                         resultDetailsGridView.add(detailLabel, j % 3, j / 3);
                     }
-                    Label returnDetailLabel = new Label(namePartsFirst[travelRoute[0] / namePartsSecond.length] + namePartsSecond[travelRoute[0] % namePartsSecond.length] + "(" + HelperMethods.convertCostToString(travelCosts[travelRoute[j-1]][travelRoute[0]]) + ")");
+                    Label returnDetailLabel = new Label(HelperMethods.createCityName(travelRoute[0]) + "(" + HelperMethods.convertCostToString(travelCosts[travelRoute[j-1]][travelRoute[0]]) + ")");
                     returnDetailLabel.setPrefHeight(25);
                     resultDetailsGridView.add(returnDetailLabel, j % 3, j / 3);
                 }
@@ -238,7 +224,6 @@ public class HelloController implements SalesmanCalculatorCallback {
 
     private void setUpCitiesPage() {
         setUpNameGrids(0, 0);
-        Integer[][] travelCostGrid = singleton.getCityTravelCostGrid();
         citiesGrid.getChildren().clear();
         citiesGrid.resize( 30 * singleton.getCityGridSize(), 25 * singleton.getCityGridSize());
         citiesGridScrollPane.resize( 30 * singleton.getCityGridSize(), 25 * singleton.getCityGridSize());
@@ -249,41 +234,23 @@ public class HelloController implements SalesmanCalculatorCallback {
             ColumnConstraints col = new ColumnConstraints(30);
             citiesGrid.getColumnConstraints().add(col);
         }
-        for(int i=0;i<singleton.getCityGridSize(); i++) {
-            for (int j=0;j<singleton.getCityGridSize(); j++) {
-                Label label = new Label(HelperMethods.convertCostToString(travelCostGrid[i][j]));
-                label.setPrefWidth(28);
-                label.setPrefHeight(23);
-                label.setBorder(border);
-                labelReferences.add(label);
-                citiesGrid.add(label, i, j);
-            }
-        }
+        populateCitiesGrid();
         citiesGridScrollPane.setPannable(true);
         symmetricPathCostCheckbox.setSelected(true);
-        symmetricPathCostCheckbox.selectedProperty().addListener((observable, oldV, newV) -> {
-            singleton.flipSymmetryConstraint();
-        });
-        citiesGridScrollPane.vvalueProperty().addListener((ov, old_val, new_val) -> {
-            setUpNameGrids(citiesGridScrollPane.getVvalue() + 0.005,
-                    citiesGridScrollPane.getHvalue() + 0.005);
-                });
+        symmetricPathCostCheckbox.selectedProperty().addListener((observable, oldV, newV) -> singleton.flipSymmetryConstraint());
+        citiesGridScrollPane.vvalueProperty().addListener((ov, old_val, new_val) -> setUpNameGrids(citiesGridScrollPane.getVvalue() + 0.005,
+                citiesGridScrollPane.getHvalue() + 0.005));
         citiesGridScrollPane.hvalueProperty().addListener((
-                ov, old_val, new_val) -> {
-            setUpNameGrids(citiesGridScrollPane.getVvalue() + 0.005,
-                    citiesGridScrollPane.getHvalue() + 0.005);
-        });
+                ov, old_val, new_val) -> setUpNameGrids(citiesGridScrollPane.getVvalue() + 0.005,
+                        citiesGridScrollPane.getHvalue() + 0.005));
     }
 
     private void redrawCities() {
         citiesGrid.resize(30 * singleton.getCityGridSize(), 25 * singleton.getCityGridSize());
         citiesGridScrollPane.resize(30 * singleton.getCityGridSize(), 25 * singleton.getCityGridSize());
-        Integer[][] travelCostGrid = singleton.getCityTravelCostGrid();
         citiesGridScrollPane.setHvalue(0);
         citiesGridScrollPane.setVvalue(0);
-        for(Label label: labelReferences) {
-            citiesGrid.getChildren().remove(label);
-        }
+        citiesGrid.getChildren().clear();
         int currentColConstraintSize = citiesGrid.getColumnCount();
         for(int i=singleton.getCityGridSize(); i<currentColConstraintSize; i++) {
             citiesGrid.getColumnConstraints().remove(0);
@@ -295,58 +262,22 @@ public class HelloController implements SalesmanCalculatorCallback {
             ColumnConstraints col = new ColumnConstraints(30);
             citiesGrid.getColumnConstraints().add(col);
         }
+        populateCitiesGrid();
+        citiesGridScrollPane.layout();
+    }
+
+
+    private void populateCitiesGrid() {
+        Integer[][] travelCostGrid = singleton.getCityTravelCostGrid();
         for(int i=0;i<singleton.getCityGridSize(); i++) {
             for (int j=0;j<singleton.getCityGridSize(); j++) {
                 Label label = new Label(HelperMethods.convertCostToString(travelCostGrid[i][j]));
                 label.setPrefWidth(28);
                 label.setPrefHeight(23);
                 label.setBorder(border);
-                labelReferences.add(label);
                 citiesGrid.add(label, i, j);
             }
         }
-        citiesGridScrollPane.layout();
-    }
-
-
-    private void setUpSettingsPage() {
-        NumericChangeListener joiningPointInputListener = new NumericChangeListener(joiningPointInput,
-                1, singleton.getCityGridSize(), singleton::setJoiningPoint, change -> {
-            joiningPointInputValid = change;
-            validateStartButton();
-        });
-        cityCountInput.setText(singleton.getCityGridSize().toString());
-        cityCountInput.textProperty().addListener(new NumericChangeListener(cityCountInput,
-                5, 999, value -> {
-            singleton.setCityGridSize(value);
-            joiningPointInputListener.maximumValue = value;
-            redrawCities();
-            travelCostAxis.setUpperBound(value * 47);
-            travelCostAxis.setLowerBound(value * 10);
-        }, change -> {
-            joiningPointInputListener.check();
-            cityCountInputValid = change;
-            validateStartButton();
-        }));
-        numberOfThreadsInput.setText(singleton.getTotalThreadAmount().toString());
-        numberOfThreadsInput.textProperty().addListener(new NumericChangeListener(numberOfThreadsInput,
-                2, 10, singleton::setTotalThreadAmount, change -> {
-            threadNumberInputValid = change;
-            validateStartButton();
-        }));
-        specimenCountInput.setText(singleton.getTotalSolutionsPerGeneration().toString());
-        specimenCountInput.textProperty().addListener(new NumericChangeListener(specimenCountInput,
-                5, 999, singleton::setTotalSolutionsPerGeneration, change -> {
-            specimenCountInputValid = change;
-            validateStartButton();
-        }));
-        joiningPointInput.setText(singleton.getJoiningPoint().toString());
-        joiningPointInput.textProperty().addListener(joiningPointInputListener);
-        multithreadedSolverCheckbox.selectedProperty().addListener((observable, oldV, newV) -> {
-            validateStartButton();
-            numberOfThreadsInput.setDisable(!newV);
-        });
-        multithreadedSolverCheckbox.setSelected(true);
     }
 
     private void setUpNameGrids(double vValue, double hValue) {
@@ -355,7 +286,7 @@ public class HelloController implements SalesmanCalculatorCallback {
             previousSideRowNumber = sideRowNumber;
             sideCityNameGrid.getChildren().clear();
             for(int i=0;i<13; i++) {
-                sideCityNameGrid.add(new Label(namePartsFirst[(sideRowNumber + i) / namePartsSecond.length] + namePartsSecond[(sideRowNumber + i) % namePartsSecond.length]), 0, i);
+                sideCityNameGrid.add(new Label(HelperMethods.createCityName(sideRowNumber + i)), 0, i);
             }
         }
         int topColumnNumber = (int) (hValue * (singleton.getCityGridSize() - 14));
@@ -363,9 +294,16 @@ public class HelloController implements SalesmanCalculatorCallback {
             previousTopColumnNumber = topColumnNumber;
             topCityNameGrid.getChildren().clear();
             for(int i=0;i<14; i++) {
-                topCityNameGrid.add(new Label(namePartsFirst[(topColumnNumber + i) / namePartsSecond.length] + namePartsSecond[(topColumnNumber + i) % namePartsSecond.length]),  i, 0);
+                topCityNameGrid.add(new Label(HelperMethods.createCityName(topColumnNumber + i)),  i, 0);
             }
         }
 
+    }
+
+    @Override
+    public void onInvalidateCityData() {
+        redrawCities();
+        travelCostAxis.setUpperBound(singleton.getCityGridSize() * 47);
+        travelCostAxis.setLowerBound(singleton.getCityGridSize() * 10);
     }
 }
