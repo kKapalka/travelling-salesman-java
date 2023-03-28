@@ -110,7 +110,9 @@ public class MainSalesmanController implements SalesmanCalculatorCallback, Sales
             averageSpecimenSeries.getData().clear();
             mainTabPane.getSelectionModel().select(2);
             generationNumberAxis.setLowerBound(0);
+            generationNumberAxis.setTickUnit(1000);
             generationNumberAxis.setUpperBound(30000);
+            generationNumberAxis.setAutoRanging(false);
             generation = 1 - singleton.getChartRefreshRate();
             calculator = CalculationModeSelector.getCalculatorBasedOnCheckbox(multithreadedSolverCheckbox.isSelected()).createCalculator(this);
             calculator.startCalculation();
@@ -135,8 +137,9 @@ public class MainSalesmanController implements SalesmanCalculatorCallback, Sales
             if(bestSpecimenSeries.getData().size() > 30) {
                 bestSpecimenSeries.getData().clear();
                 averageSpecimenSeries.getData().clear();
-                generationNumberAxis.setLowerBound(generation);
-                generationNumberAxis.setUpperBound(generation + 30000);
+                generationNumberAxis.setLowerBound(generation-1);
+                generationNumberAxis.setUpperBound(generation + 29999);
+                travelCostAxis.setAutoRanging(true);
             }
             averageSpecimenSeries.getData().add(new javafx.scene.chart.XYChart.Data<>(generation, averageCost / 10));
             bestSpecimenSeries.getData().add(new javafx.scene.chart.XYChart.Data<>(generation, minimumCost / 10));
@@ -304,6 +307,7 @@ public class MainSalesmanController implements SalesmanCalculatorCallback, Sales
     public void onInvalidateCityData() {
         redrawCities();
         travelCostAxis.setUpperBound(singleton.getCityGridSize() * 47);
-        travelCostAxis.setLowerBound(singleton.getCityGridSize() * 10);
+        travelCostAxis.setLowerBound(singleton.getCityGridSize() * 9);
+        travelCostAxis.setAutoRanging(false);
     }
 }
